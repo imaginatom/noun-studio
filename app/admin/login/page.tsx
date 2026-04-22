@@ -13,7 +13,9 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [resetMessage, setResetMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSendingReset, setIsSendingReset] = useState(false)
   const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
@@ -46,6 +48,7 @@ export default function AdminLoginPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError(null)
+    setResetMessage(null)
     setIsSubmitting(true)
 
     const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -72,6 +75,32 @@ export default function AdminLoginPage() {
     }
 
     router.replace('/admin')
+  }
+
+  const handleForgotPassword = async () => {
+    setError(null)
+    setResetMessage(null)
+
+    const trimmedEmail = email.trim()
+    if (!trimmedEmail) {
+      setError('Enter your admin email first.')
+      return
+    }
+
+    setIsSendingReset(true)
+    const redirectTo = `${window.location.origin}/admin/reset-password`
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+      redirectTo,
+    })
+
+    if (resetError) {
+      setError(resetError.message)
+      setIsSendingReset(false)
+      return
+    }
+
+    setResetMessage('If an account exists for this email, a reset link has been sent.')
+    setIsSendingReset(false)
   }
 
   return (
@@ -110,11 +139,25 @@ export default function AdminLoginPage() {
               onChange={(event) => setPassword(event.target.value)}
               required
             />
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+              disabled={isSubmitting || isSendingReset || isChecking}
+            >
+              {isSendingReset ? 'Sending reset link...' : 'Forgot password?'}
+            </button>
           </div>
 
           {error ? (
             <p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {error}
+            </p>
+          ) : null}
+
+          {resetMessage ? (
+            <p className="rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-foreground">
+              {resetMessage}
             </p>
           ) : null}
 

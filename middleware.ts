@@ -35,7 +35,13 @@ export async function middleware(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const isLoginRoute = request.nextUrl.pathname.startsWith('/admin/login')
+  const pathname = request.nextUrl.pathname
+  const isLoginRoute = pathname.startsWith('/admin/login')
+  const isResetPasswordRoute = pathname.startsWith('/admin/reset-password')
+
+  if (isResetPasswordRoute) {
+    return response
+  }
 
   if (isLoginRoute) {
     if (!user) {
