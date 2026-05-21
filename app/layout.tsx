@@ -24,7 +24,7 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://noun-studio.com"),
+  metadataBase: new URL("https://noun-studio-xs17.vercel.app"),
   title: {
     default: "Noun Studio | Cabinet d'architecture \u00e0 Oran",
     template: "%s | Noun Studio",
@@ -87,14 +87,14 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Architect",
   name: "Noun Studio",
-  image: "https://noun-studio.com/images/og-image.jpg",
+  image: "https://noun-studio-xs17.vercel.app/images/og-image.jpg",
   email: "contact@nounstudio.dz",
   founder: {
     "@type": "Person",
     name: "SAHNOUNE Mohammed",
     jobTitle: "Architecte & Directeur Cr\u00e9atif",
   },
-  url: "https://noun-studio.com",
+  url: "https://noun-studio-xs17.vercel.app",
   description:
     "Cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture et contenu culturel.",
   address: {
