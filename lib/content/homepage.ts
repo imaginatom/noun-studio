@@ -92,7 +92,7 @@ export const homePageSectionOrder: HomePageSectionKey[] = [
 
 export const homePageDefaults: HomePageContent = {
   hero: {
-    badgeText: 'Architecture · Branding · Contenu culturel',
+    badgeText: 'Architecture · Contenu culturel',
     title: 'Architecture, Design & Identité Culturelle',
     subtitle:
       "Noun Studio est un cabinet d'architecture et studio de design multidisciplinaire fondé par SAHNOUNE Mohammed. Nous concevons des espaces, des marques et des histoires.",
@@ -127,11 +127,6 @@ export const homePageDefaults: HomePageContent = {
           'Conception et suivi de projets architecturaux résidentiels, commerciaux et de rénovation. Du diagnostic à la livraison.',
       },
       {
-        title: 'Identité Visuelle',
-        description:
-          "Création de logos, systèmes d'identité, chartes graphiques et kits de communication pour entreprises et startups.",
-      },
-      {
         title: 'Contenu Culturel',
         description:
           "Production de contenu autour de l'architecture, du patrimoine algérien et de la culture du design.",
@@ -162,7 +157,7 @@ export const homePageDefaults: HomePageContent = {
       },
       {
         title: 'Vision stratégique',
-        description: "L'architecture comme outil de branding et d'expression.",
+        description: "L'architecture comme outil d'expression et de mise en valeur des lieux.",
       },
       {
         title: 'Écoute & sur-mesure',
@@ -223,17 +218,12 @@ export const homePageDefaults: HomePageContent = {
     eyebrow: 'Présence locale',
     title: 'Basé à Oran, Algérie',
     body:
-      "Noun Studio est implanté à Oran et intervient à travers l'Algérie. Notre positionnement combine l'expertise technique en architecture avec le développement d'identités visuelles et la création de contenu culturel lié au patrimoine architectural algérien.",
+      "Noun Studio est implanté à Oran et intervient à travers l'Algérie. Notre positionnement combine l'expertise technique en architecture et la création de contenu culturel lié au patrimoine architectural algérien.",
     highlights: [
       {
         title: 'Architecture à Oran',
         description:
           'Résidentiel, commercial et rénovation à Oran. Des projets ancrés dans le patrimoine local avec une vision contemporaine.',
-      },
-      {
-        title: 'Branding à Oran',
-        description:
-          'Identités visuelles et direction artistique pour des marques locales et nationales.',
       },
       {
         title: 'Contenu culturel',
@@ -284,17 +274,18 @@ const mergeList = <T extends Record<string, unknown>>(
   value: unknown,
 ): T[] => {
   if (!Array.isArray(value)) {
-    return fallback
+    return []
   }
-  return fallback.map((item, index) => {
-    const entry = value[index]
+  const template = fallback[0]
+  return value.flatMap((entry, index) => {
     if (!isRecord(entry)) {
-      return item
+      return []
     }
+    const item = fallback[index] ?? template
     return {
-      ...item,
+      ...(item ?? {}),
       ...(entry as Partial<T>),
-    }
+    } as T
   })
 }
 

@@ -1,6 +1,6 @@
 import React from "react"
 import type { Metadata, Viewport } from "next"
-import { DM_Sans, Playfair_Display } from "next/font/google"
+import { Inter, Cormorant_Garamond } from "next/font/google"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { FloatingCTA } from "@/components/floating-cta"
@@ -8,30 +8,34 @@ import { BackToTop } from "@/components/back-to-top"
 import { ScrollAnimations } from "@/components/scroll-animations"
 import "./globals.css"
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-sans",
+  display: "swap",
 })
 
-const playfair = Playfair_Display({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-playfair",
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-display",
+  display: "swap",
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nounstudio.dz"),
+  metadataBase: new URL("https://noun-studio.com"),
   title: {
     default: "Noun Studio | Cabinet d'architecture \u00e0 Oran",
     template: "%s | Noun Studio",
   },
   description:
-    "Noun Studio, cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture r\u00e9sidentielle et commerciale, branding et contenu culturel.",
+    "Noun Studio, cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture r\u00e9sidentielle et commerciale et contenu culturel.",
   keywords: [
     "architecte Oran",
     "cabinet d'architecture Oran",
     "architecture Oran",
     "studio design Oran",
-    "branding Oran",
     "Noun Studio",
     "Alg\u00e9rie",
   ],
@@ -43,30 +47,38 @@ export const metadata: Metadata = {
     locale: "fr_DZ",
     url: "/",
     siteName: "Noun Studio",
-    title: "Noun Studio | Cabinet d'architecture \u00e0 Oran",
+    title: "Noun Studio — Architecture & Design",
     description:
-      "Cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture, branding et contenu culturel.",
+      "Cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture et contenu culturel.",
     images: [
       {
-        url: "/images/hero-bg.jpg",
+        url: "/images/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Noun Studio \u00e0 Oran, Alg\u00e9rie",
       },
     ],
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
   twitter: {
     card: "summary_large_image",
     title: "Noun Studio | Cabinet d'architecture \u00e0 Oran",
     description:
-      "Cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture, branding et contenu culturel.",
-    images: ["/images/hero-bg.jpg"],
-  },
-  generator: "v0.app",
+      "Cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture et contenu culturel.",
+    images: ["/images/og-image.jpg"],
+  }
 }
 
 export const viewport: Viewport = {
-  themeColor: "#2d2521",
+  themeColor: "#0a0a0a",
   width: "device-width",
   initialScale: 1,
 }
@@ -75,16 +87,16 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Architect",
   name: "Noun Studio",
-  image: "/images/hero-bg.jpg",
+  image: "https://noun-studio.com/images/og-image.jpg",
   email: "contact@nounstudio.dz",
   founder: {
     "@type": "Person",
     name: "SAHNOUNE Mohammed",
     jobTitle: "Architecte & Directeur Cr\u00e9atif",
   },
-  url: "https://nounstudio.dz",
+  url: "https://noun-studio.com",
   description:
-    "Cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture, branding et contenu culturel.",
+    "Cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture et contenu culturel.",
   address: {
     "@type": "PostalAddress",
     addressLocality: "Oran",
@@ -101,7 +113,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="fr-DZ" className={`${dmSans.variable} ${playfair.variable}`}>
+    <html lang="fr-DZ" className={`${inter.variable} ${cormorant.variable}`}>
       <head>
         <script
           type="application/ld+json"

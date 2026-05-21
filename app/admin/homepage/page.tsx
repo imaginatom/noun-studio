@@ -15,6 +15,9 @@ import {
   type HomePageContent,
   type HomePageSectionKey,
 } from "@/lib/content/homepage"
+import { diffOrphanedPaths } from "@/lib/content/image-paths"
+
+const SITE_IMAGES_BUCKET = "site-images"
 
 type SaveState = {
   isSaving: boolean
@@ -40,6 +43,36 @@ const updateListItem = <T,>(list: T[], index: number, value: T): T[] => {
   next[index] = value
   return next
 }
+
+const removeListItem = <T,>(list: T[], index: number): T[] =>
+  list.filter((_, i) => i !== index)
+
+const emptyStat = (): HomePageContent["socialProof"]["stats"][number] => ({
+  value: "",
+  label: "",
+})
+
+const emptyService = (): HomePageContent["services"]["items"][number] => ({
+  title: "",
+  description: "",
+})
+
+const emptyBenefit = (): HomePageContent["whyUs"]["benefits"][number] => ({
+  title: "",
+  description: "",
+})
+
+const emptyTestimonial = (): HomePageContent["testimonials"]["items"][number] => ({
+  stars: 5,
+  text: "",
+  name: "",
+  city: "",
+})
+
+const emptyHighlight = (): HomePageContent["localSeo"]["highlights"][number] => ({
+  title: "",
+  description: "",
+})
 
 export default function AdminHomepageEditor() {
   const supabase = useMemo(() => createSupabaseBrowserClient(), [])
@@ -97,12 +130,12 @@ export default function AdminHomepageEditor() {
 
   const saveSection = async (section: HomePageSectionKey) => {
     setSectionState(section, { isSaving: true, message: null, error: null })
-    const payload = content[section]
-    const sortOrder = homePageSectionOrder.indexOf(section)
+
+    const newContent = content[section]
 
     const { data: existing, error: fetchError } = await supabase
       .from("site_content")
-      .select("id")
+      .select("content")
       .eq("page", "home")
       .eq("section", section)
       .maybeSingle()
@@ -110,22 +143,23 @@ export default function AdminHomepageEditor() {
     if (fetchError) {
       setSectionState(section, {
         isSaving: false,
-        error: fetchError.message || "Unable to fetch content entry.",
+        error: fetchError.message || "Unable to load previous content.",
       })
       return
     }
 
-    const upsertPayload = {
-      page: "home",
-      section,
-      content_type: "text",
-      content: payload,
-      sort_order: sortOrder,
-    }
-
-    const { error: saveError } = existing?.id
-      ? await supabase.from("site_content").update(upsertPayload).eq("id", existing.id)
-      : await supabase.from("site_content").insert(upsertPayload)
+    const { error: saveError } = await supabase
+      .from("site_content")
+      .upsert(
+        {
+          page: "home",
+          section,
+          content_type: "text",
+          content: newContent,
+          sort_order: homePageSectionOrder.indexOf(section),
+        },
+        { onConflict: "page,section" },
+      )
 
     if (saveError) {
       setSectionState(section, {
@@ -135,10 +169,17 @@ export default function AdminHomepageEditor() {
       return
     }
 
-    setSectionState(section, {
-      isSaving: false,
-      message: "Saved successfully.",
-    })
+    const orphanedPaths = diffOrphanedPaths(existing?.content, newContent)
+    if (orphanedPaths.length > 0) {
+      const { error: removeError } = await supabase.storage
+        .from(SITE_IMAGES_BUCKET)
+        .remove(orphanedPaths)
+      if (removeError) {
+        console.warn("Failed to delete orphaned images:", removeError.message)
+      }
+    }
+
+    setSectionState(section, { isSaving: false, message: "Saved successfully." })
   }
 
   return (
@@ -315,8 +356,31 @@ export default function AdminHomepageEditor() {
               <CardDescription>Short stats under the hero.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              {content.socialProof.stats.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                  No stats yet. Click &quot;Add stat&quot; below to create one.
+                </div>
+              ) : null}
               {content.socialProof.stats.map((stat, index) => (
-                <div key={`social-proof-${index}`} className="grid gap-4 md:grid-cols-2">
+                <div key={`social-proof-${index}`} className="space-y-3 rounded-lg border border-border p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium text-muted-foreground">Stat {index + 1}</p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() =>
+                        updateSection("socialProof", (prev) => ({
+                          ...prev,
+                          stats: removeListItem(prev.stats, index),
+                        }))
+                      }
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor={`social-proof-value-${index}`}>Value</Label>
                     <Input
@@ -349,8 +413,23 @@ export default function AdminHomepageEditor() {
                       }
                     />
                   </div>
+                  </div>
                 </div>
               ))}
+              <div className="flex justify-start">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    updateSection("socialProof", (prev) => ({
+                      ...prev,
+                      stats: [...prev.stats, emptyStat()],
+                    }))
+                  }
+                >
+                  + Add stat
+                </Button>
+              </div>
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-between gap-3">
               <Button
@@ -403,8 +482,30 @@ export default function AdminHomepageEditor() {
                 </div>
               </div>
               <div className="space-y-4">
+                {content.services.items.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                    No services yet. Click &quot;Add service&quot; below to create one.
+                  </div>
+                ) : null}
                 {content.services.items.map((service, index) => (
                   <div key={`service-${index}`} className="space-y-3 rounded-lg border border-border p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-medium text-muted-foreground">Service {index + 1}</p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() =>
+                          updateSection("services", (prev) => ({
+                            ...prev,
+                            items: removeListItem(prev.items, index),
+                          }))
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </div>
                     <div className="space-y-2">
                       <Label htmlFor={`service-title-${index}`}>Service title</Label>
                       <Input
@@ -439,6 +540,20 @@ export default function AdminHomepageEditor() {
                     </div>
                   </div>
                 ))}
+                <div className="flex justify-start">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      updateSection("services", (prev) => ({
+                        ...prev,
+                        items: [...prev.items, emptyService()],
+                      }))
+                    }
+                  >
+                    + Add service
+                  </Button>
+                </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-between gap-3">
@@ -558,8 +673,30 @@ export default function AdminHomepageEditor() {
                 </div>
               </div>
               <div className="space-y-4">
+                {content.whyUs.benefits.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                    No benefits yet. Click &quot;Add benefit&quot; below to create one.
+                  </div>
+                ) : null}
                 {content.whyUs.benefits.map((benefit, index) => (
                   <div key={`whyus-benefit-${index}`} className="space-y-3 rounded-lg border border-border p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-medium text-muted-foreground">Benefit {index + 1}</p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() =>
+                          updateSection("whyUs", (prev) => ({
+                            ...prev,
+                            benefits: removeListItem(prev.benefits, index),
+                          }))
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </div>
                     <div className="space-y-2">
                       <Label htmlFor={`whyus-benefit-title-${index}`}>Benefit title</Label>
                       <Input
@@ -594,6 +731,20 @@ export default function AdminHomepageEditor() {
                     </div>
                   </div>
                 ))}
+                <div className="flex justify-start">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      updateSection("whyUs", (prev) => ({
+                        ...prev,
+                        benefits: [...prev.benefits, emptyBenefit()],
+                      }))
+                    }
+                  >
+                    + Add benefit
+                  </Button>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="whyus-cta">CTA label</Label>
@@ -660,8 +811,30 @@ export default function AdminHomepageEditor() {
                 </div>
               </div>
               <div className="space-y-4">
+                {content.testimonials.items.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                    No testimonials yet. Click &quot;Add testimonial&quot; below to create one.
+                  </div>
+                ) : null}
                 {content.testimonials.items.map((testimonial, index) => (
                   <div key={`testimonial-${index}`} className="space-y-3 rounded-lg border border-border p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-medium text-muted-foreground">Testimonial {index + 1}</p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() =>
+                          updateSection("testimonials", (prev) => ({
+                            ...prev,
+                            items: removeListItem(prev.items, index),
+                          }))
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </div>
                     <div className="grid gap-4 md:grid-cols-3">
                       <div className="space-y-2">
                         <Label htmlFor={`testimonial-name-${index}`}>Name</Label>
@@ -734,6 +907,20 @@ export default function AdminHomepageEditor() {
                     </div>
                   </div>
                 ))}
+                <div className="flex justify-start">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      updateSection("testimonials", (prev) => ({
+                        ...prev,
+                        items: [...prev.items, emptyTestimonial()],
+                      }))
+                    }
+                  >
+                    + Add testimonial
+                  </Button>
+                </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-between gap-3">
@@ -879,8 +1066,30 @@ export default function AdminHomepageEditor() {
                 />
               </div>
               <div className="space-y-4">
+                {content.localSeo.highlights.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                    No highlights yet. Click &quot;Add highlight&quot; below to create one.
+                  </div>
+                ) : null}
                 {content.localSeo.highlights.map((highlight, index) => (
                   <div key={`localseo-highlight-${index}`} className="space-y-3 rounded-lg border border-border p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-medium text-muted-foreground">Highlight {index + 1}</p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() =>
+                          updateSection("localSeo", (prev) => ({
+                            ...prev,
+                            highlights: removeListItem(prev.highlights, index),
+                          }))
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </div>
                     <div className="space-y-2">
                       <Label htmlFor={`localseo-highlight-title-${index}`}>Highlight title</Label>
                       <Input
@@ -915,6 +1124,20 @@ export default function AdminHomepageEditor() {
                     </div>
                   </div>
                 ))}
+                <div className="flex justify-start">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      updateSection("localSeo", (prev) => ({
+                        ...prev,
+                        highlights: [...prev.highlights, emptyHighlight()],
+                      }))
+                    }
+                  >
+                    + Add highlight
+                  </Button>
+                </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-between gap-3">

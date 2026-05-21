@@ -12,7 +12,7 @@ import {
 export const metadata: Metadata = {
   title: "Contact — Consultation Gratuite",
   description:
-    "Contactez Noun Studio pour discuter de votre projet d'architecture ou de branding. Consultation gratuite, r\u00e9ponse sous 48h.",
+    "Contactez Noun Studio pour discuter de votre projet d'architecture. Consultation gratuite, r\u00e9ponse sous 48h.",
 }
 
 const contactInfo = [
@@ -34,17 +34,17 @@ const faqs = [
   {
     question: "Quels types de projets r\u00e9alisez-vous\u00a0?",
     answer:
-      "Nous intervenons sur des projets d'architecture r\u00e9sidentielle et commerciale, de r\u00e9novation, de visualisation 3D, ainsi que sur la cr\u00e9ation d'identit\u00e9s visuelles compl\u00e8tes (logo, charte graphique, supports de communication). Chaque projet est trait\u00e9 sur mesure.",
+      "Nous intervenons sur des projets d'architecture r\u00e9sidentielle et commerciale, de r\u00e9novation et de visualisation 3D. Chaque projet est trait\u00e9 sur mesure.",
   },
   {
     question: "Comment d\u00e9marre un projet\u00a0?",
     answer:
-      "Tout commence par un \u00e9change par email ou via notre formulaire. Nous organisons ensuite une consultation gratuite pour comprendre vos besoins, votre terrain (pour l'architecture) ou votre activit\u00e9 (pour le branding), puis nous vous envoyons une proposition d\u00e9taill\u00e9e.",
+      "Tout commence par un \u00e9change par email ou via notre formulaire. Nous organisons ensuite une consultation gratuite pour comprendre vos besoins et votre terrain, puis nous vous envoyons une proposition d\u00e9taill\u00e9e.",
   },
   {
     question: "Intervenez-vous en France\u00a0?",
     answer:
-      "Oui, notre studio est bas\u00e9 en Alg\u00e9rie mais notre port\u00e9e professionnelle s'\u00e9tend \u00e0 la France, notamment pour les projets de branding et d'identit\u00e9 visuelle qui peuvent \u00eatre r\u00e9alis\u00e9s \u00e0 distance.",
+      "Oui, notre studio est bas\u00e9 en Alg\u00e9rie mais notre port\u00e9e professionnelle s'\u00e9tend \u00e0 la France pour certains projets d'architecture.",
   },
   {
     question: "Quels sont vos tarifs\u00a0?",
@@ -54,7 +54,7 @@ const faqs = [
   {
     question: "Combien de temps dure un projet\u00a0?",
     answer:
-      "Une identit\u00e9 visuelle compl\u00e8te prend g\u00e9n\u00e9ralement 3 \u00e0 6 semaines. Un projet d'architecture r\u00e9sidentiel, de la conception \u00e0 la livraison des plans, peut prendre 2 \u00e0 4 mois. Le suivi de chantier d\u00e9pend de la dur\u00e9e de construction.",
+      "Un projet d'architecture r\u00e9sidentiel, de la conception \u00e0 la livraison des plans, peut prendre 2 \u00e0 4 mois. Le suivi de chantier d\u00e9pend de la dur\u00e9e de construction.",
   },
   {
     question: "Qui compose l'\u00e9quipe de Noun Studio\u00a0?",

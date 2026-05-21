@@ -1,0 +1,101 @@
+/* 3D Perspective Text
+ *
+ * Adapted from Olivier Larose's pure-CSS 3D text animation.
+ * - The outer `plane` receives a mouse-driven perspective transform from JS.
+ * - Each `textContainer` rotates 90deg on hover, with a `primary` (filled)
+ *   word transitioning out and a `secondary` (outlined) word folding in
+ *   from beneath, creating an editorial "flip" reveal.
+ */
+
+.root {
+  display: block;
+  width: 100%;
+  /* Reserve space so the perspective plane has room to tilt without
+   * pushing surrounding content. */
+  padding: 0.25em 0;
+}
+
+.plane {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding-top: 1rem;
+  transform-style: preserve-3d;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.textContainer {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--stagger-delay, 0ms);
+}
+
+.primary,
+.secondary {
+  margin: 0;
+  font-family: var(--font-display), "Cormorant Garamond", ui-serif, Georgia, serif;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 74px;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--stagger-delay, 0ms);
+}
+
+.primary {
+  color: #000;
+}
+
+.secondary {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  color: transparent;
+  -webkit-text-stroke: 1.5px #000;
+  text-stroke: 1.5px #000;
+  transform: rotateX(-90deg) translateY(0.42em);
+  transform-origin: bottom center;
+}
+
+.textContainer.flipped {
+  transform: rotateX(90deg);
+}
+
+.textContainer.flipped .primary {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.textContainer.flipped .secondary {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plane,
+  .textContainer,
+  .primary,
+  .secondary {
+    transition: none !important;
+  }
+  .plane {
+    transform: none !important;
+  }
+  .textContainer.flipped {
+    transform: none;
+  }
+  .textContainer.flipped .primary {
+    transform: none;
+    opacity: 1;
+  }
+  .textContainer.flipped .secondary {
+    opacity: 0;
+  }
+}

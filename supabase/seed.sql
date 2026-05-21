@@ -4,7 +4,7 @@ select
   'hero',
   'text',
   '{
-    "badgeText": "Architecture · Branding · Contenu culturel",
+    "badgeText": "Architecture · Contenu culturel",
     "title": "Architecture, Design & Identité Culturelle",
     "subtitle": "Noun Studio est un cabinet d''architecture et studio de design multidisciplinaire fondé par SAHNOUNE Mohammed. Nous concevons des espaces, des marques et des histoires.",
     "trustBullets": [
@@ -53,10 +53,6 @@ select
         "description": "Conception et suivi de projets architecturaux résidentiels, commerciaux et de rénovation. Du diagnostic à la livraison."
       },
       {
-        "title": "Identité Visuelle",
-        "description": "Création de logos, systèmes d''identité, chartes graphiques et kits de communication pour entreprises et startups."
-      },
-      {
         "title": "Contenu Culturel",
         "description": "Production de contenu autour de l''architecture, du patrimoine algérien et de la culture du design."
       }
@@ -87,7 +83,7 @@ select
       },
       {
         "title": "Vision stratégique",
-        "description": "L''architecture comme outil de branding et d''expression."
+        "description": "L''architecture comme outil d''expression et de mise en valeur des lieux."
       },
       {
         "title": "Écoute & sur-mesure",
@@ -180,10 +176,6 @@ select
       {
         "title": "Architecture à Oran",
         "description": "Résidentiel, commercial et rénovation à Oran. Des projets ancrés dans le patrimoine local avec une vision contemporaine."
-      },
-      {
-        "title": "Branding à Oran",
-        "description": "Identités visuelles et direction artistique pour des marques locales et nationales."
       },
       {
         "title": "Contenu culturel",

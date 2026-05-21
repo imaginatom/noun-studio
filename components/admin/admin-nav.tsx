@@ -10,7 +10,6 @@ const adminLinks = [
   { label: "Homepage", href: "/admin/homepage" },
   { label: "Portfolio", href: "/admin/portfolio" },
   { label: "Architecture", href: "/admin/architecture" },
-  { label: "Branding", href: "/admin/branding" },
 ]
 
 export function AdminNav() {

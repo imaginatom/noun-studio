@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Star, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, ArrowRight } from "lucide-react"
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
 
 type TestimonialsContent = HomePageContent["testimonials"]
@@ -15,82 +15,66 @@ export function TestimonialsSection({
   const testimonials = content.items
 
   useEffect(() => {
-    if (current >= testimonials.length) {
+    if (testimonials.length > 0 && current >= testimonials.length) {
       setCurrent(0)
     }
   }, [current, testimonials.length])
 
+  if (testimonials.length === 0) {
+    return null
+  }
+
   const prev = () => setCurrent((c) => (c === 0 ? testimonials.length - 1 : c - 1))
   const next = () => setCurrent((c) => (c === testimonials.length - 1 ? 0 : c + 1))
+  const active = testimonials[current]
 
   return (
-    <section className="py-20 lg:py-28">
-      <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <div className="animate-on-scroll mx-auto max-w-2xl text-center">
-          <p className="text-sm font-medium uppercase tracking-widest text-accent">{content.eyebrow}</p>
-          <h2 className="mt-2 font-serif text-3xl font-bold text-foreground md:text-4xl text-balance">
-            {content.title}
-          </h2>
+    <section className="bg-background py-24 lg:py-32">
+      <div className="mx-auto max-w-5xl px-6 lg:px-10">
+        <div className="animate-on-scroll mb-16 flex items-baseline justify-between border-b border-border pb-6">
+          <p className="eyebrow">— {content.eyebrow}</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+            {String(current + 1).padStart(2, "0")} / {String(testimonials.length).padStart(2, "0")}
+          </p>
         </div>
 
-        {/* Carousel */}
-        <div className="animate-on-scroll relative mt-14">
-          <div className="overflow-hidden">
-            <div
-              className="flex transition-transform duration-500 ease-out"
-              style={{ transform: `translateX(-${current * 100}%)` }}
-            >
-              {testimonials.map((t, i) => (
-                <div key={i} className="w-full shrink-0 px-4">
-                  <div className="mx-auto max-w-2xl rounded-2xl border border-border bg-card p-8 text-center md:p-10 transition-shadow duration-300 hover:shadow-lg">
-                    {/* Stars */}
-                    <div className="flex items-center justify-center gap-1">
-                      {Array.from({ length: 5 }).map((_, s) => (
-                        <Star
-                          key={s}
-                          className={`h-4 w-4 ${s < t.stars ? "fill-accent text-accent" : "fill-muted text-muted"}`}
-                        />
-                      ))}
-                    </div>
-                    <blockquote className="mt-6 font-serif text-lg leading-relaxed text-foreground md:text-xl">
-                      {`\u201c${t.text}\u201d`}
-                    </blockquote>
-                    <div className="mt-6">
-                      <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">{t.city}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        <div className="animate-on-scroll">
+          <h2 className="sr-only">{content.title}</h2>
 
-          {/* Controls */}
-          <div className="mt-8 flex items-center justify-center gap-4">
-            <button
-              onClick={prev}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all duration-200 ease-out hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-110 active:scale-95"
-              aria-label={"T\u00e9moignage pr\u00e9c\u00e9dent"}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <div className="flex items-center gap-2">
-              {testimonials.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrent(i)}
-                  className={`h-2 rounded-full transition-all ${i === current ? "w-6 bg-primary" : "w-2 bg-border"}`}
-                  aria-label={`Aller au t\u00e9moignage ${i + 1}`}
-                />
-              ))}
+          <blockquote className="font-serif text-3xl font-light italic leading-[1.25] text-foreground md:text-4xl lg:text-5xl">
+            <span aria-hidden="true" className="mr-1 text-muted-foreground/70">“</span>
+            {active.text}
+            <span aria-hidden="true" className="ml-1 text-muted-foreground/70">”</span>
+          </blockquote>
+
+          <div className="mt-14 flex items-end justify-between gap-6">
+            <div>
+              <p className="text-sm font-medium tracking-wide text-foreground">{active.name}</p>
+              <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+                {active.city}
+              </p>
             </div>
-            <button
-              onClick={next}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground transition-all duration-200 ease-out hover:bg-primary hover:text-primary-foreground hover:border-primary hover:scale-110 active:scale-95"
-              aria-label={"T\u00e9moignage suivant"}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
+
+            {testimonials.length > 1 && (
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={prev}
+                  className="flex h-10 w-10 items-center justify-center border border-border text-foreground transition-colors hover:bg-foreground hover:text-background"
+                  aria-label="Témoignage précédent"
+                >
+                  <ArrowLeft className="h-4 w-4" strokeWidth={1.5} />
+                </button>
+                <button
+                  type="button"
+                  onClick={next}
+                  className="flex h-10 w-10 items-center justify-center border border-border text-foreground transition-colors hover:bg-foreground hover:text-background"
+                  aria-label="Témoignage suivant"
+                >
+                  <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

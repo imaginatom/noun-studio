@@ -43,9 +43,22 @@ export function ImageUpload({
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Tracks paths uploaded during this editing session that have NOT been
+  // persisted to the database yet. When a session draft is replaced or
+  // discarded, we can safely delete it from storage. Database-sourced paths
+  // are never deleted here — that happens at save time via diff cleanup.
+  const sessionDraftPathRef = useRef<string | null>(null)
+  const initialDbPathRef = useRef<string | null>(value?.path ?? null)
+
   useEffect(() => {
     setPreviewUrl(value?.src ?? null)
   }, [value?.src])
+
+  useEffect(() => {
+    if (value?.path && value.path !== sessionDraftPathRef.current) {
+      initialDbPathRef.current = value.path
+    }
+  }, [value?.path])
 
   useEffect(() => {
     return () => {
@@ -54,6 +67,20 @@ export function ImageUpload({
       }
     }
   }, [previewUrl])
+
+  const removeSessionDraft = async () => {
+    const draftPath = sessionDraftPathRef.current
+    if (!draftPath) {
+      return
+    }
+    sessionDraftPathRef.current = null
+    const { error: removeError } = await supabase.storage
+      .from(bucket)
+      .remove([draftPath])
+    if (removeError) {
+      console.warn("Failed to remove session draft image:", removeError.message)
+    }
+  }
 
   const handleFiles = async (files: FileList | null) => {
     const file = files?.[0]
@@ -70,6 +97,8 @@ export function ImageUpload({
       return localPreview
     })
     setIsUploading(true)
+
+    await removeSessionDraft()
 
     const path = createStoragePath(file.name)
     const { error: uploadError } = await supabase.storage.from(bucket).upload(path, file, {
@@ -90,6 +119,7 @@ export function ImageUpload({
       return
     }
 
+    sessionDraftPathRef.current = path
     onChange({ src: data.publicUrl, path })
     setIsUploading(false)
   }
@@ -100,16 +130,10 @@ export function ImageUpload({
     }
 
     setError(null)
+    setIsUploading(true)
 
-    if (value?.path) {
-      setIsUploading(true)
-      const { error: removeError } = await supabase.storage.from(bucket).remove([value.path])
-      if (removeError) {
-        setError(removeError.message || "Unable to delete image.")
-        setIsUploading(false)
-        return
-      }
-    }
+    // Always clean up any session draft.
+    await removeSessionDraft()
 
     onChange({ src: "", path: null })
     setPreviewUrl(null)

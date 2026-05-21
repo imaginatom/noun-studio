@@ -15,6 +15,9 @@ import {
   type ArchitecturePageContent,
   type ArchitecturePageSectionKey,
 } from "@/lib/content/architecture"
+import { diffOrphanedPaths } from "@/lib/content/image-paths"
+
+const SITE_IMAGES_BUCKET = "site-images"
 
 type SaveState = {
   isSaving: boolean
@@ -95,12 +98,12 @@ export default function AdminArchitectureEditor() {
 
   const saveSection = async (section: ArchitecturePageSectionKey) => {
     setSectionState(section, { isSaving: true, message: null, error: null })
-    const payload = content[section]
-    const sortOrder = architectureSectionOrder.indexOf(section)
+
+    const newContent = content[section]
 
     const { data: existing, error: fetchError } = await supabase
       .from("site_content")
-      .select("id")
+      .select("content")
       .eq("page", "architecture")
       .eq("section", section)
       .maybeSingle()
@@ -108,22 +111,23 @@ export default function AdminArchitectureEditor() {
     if (fetchError) {
       setSectionState(section, {
         isSaving: false,
-        error: fetchError.message || "Unable to fetch content entry.",
+        error: fetchError.message || "Unable to load previous content.",
       })
       return
     }
 
-    const upsertPayload = {
-      page: "architecture",
-      section,
-      content_type: "text",
-      content: payload,
-      sort_order: sortOrder,
-    }
-
-    const { error: saveError } = existing?.id
-      ? await supabase.from("site_content").update(upsertPayload).eq("id", existing.id)
-      : await supabase.from("site_content").insert(upsertPayload)
+    const { error: saveError } = await supabase
+      .from("site_content")
+      .upsert(
+        {
+          page: "architecture",
+          section,
+          content_type: "text",
+          content: newContent,
+          sort_order: architectureSectionOrder.indexOf(section),
+        },
+        { onConflict: "page,section" },
+      )
 
     if (saveError) {
       setSectionState(section, {
@@ -133,10 +137,17 @@ export default function AdminArchitectureEditor() {
       return
     }
 
-    setSectionState(section, {
-      isSaving: false,
-      message: "Saved successfully.",
-    })
+    const orphanedPaths = diffOrphanedPaths(existing?.content, newContent)
+    if (orphanedPaths.length > 0) {
+      const { error: removeError } = await supabase.storage
+        .from(SITE_IMAGES_BUCKET)
+        .remove(orphanedPaths)
+      if (removeError) {
+        console.warn("Failed to delete orphaned images:", removeError.message)
+      }
+    }
+
+    setSectionState(section, { isSaving: false, message: "Saved successfully." })
   }
 
   return (
@@ -580,32 +591,82 @@ export default function AdminArchitectureEditor() {
           <Card>
             <CardHeader>
               <CardTitle>CTA</CardTitle>
-              <CardDescription>Call-to-action copy above the contact form.</CardDescription>
+              <CardDescription>
+                Background image, headline phrase, and glass CTA button (right two-thirds).
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="architecture-cta-phrase">Phrase</Label>
+                <Textarea
+                  id="architecture-cta-phrase"
+                  value={content.cta.phrase}
+                  onChange={(event) =>
+                    updateSection("cta", (prev) => ({
+                      ...prev,
+                      phrase: event.target.value,
+                    }))
+                  }
+                />
+              </div>
               <div className="grid gap-4 md:grid-cols-2">
+                <ImageUpload
+                  label="CTA background image"
+                  value={{
+                    src: content.cta.backgroundImage.src,
+                    path: content.cta.backgroundImage.path ?? null,
+                  }}
+                  onChange={(nextValue) =>
+                    updateSection("cta", (prev) => ({
+                      ...prev,
+                      backgroundImage: {
+                        ...prev.backgroundImage,
+                        src: nextValue.src,
+                        path: nextValue.path ?? null,
+                      },
+                    }))
+                  }
+                />
                 <div className="space-y-2">
-                  <Label htmlFor="architecture-cta-title">Title</Label>
+                  <Label htmlFor="architecture-cta-bg-alt">Background alt text</Label>
                   <Input
-                    id="architecture-cta-title"
-                    value={content.cta.title}
+                    id="architecture-cta-bg-alt"
+                    value={content.cta.backgroundImage.alt}
                     onChange={(event) =>
                       updateSection("cta", (prev) => ({
                         ...prev,
-                        title: event.target.value,
+                        backgroundImage: {
+                          ...prev.backgroundImage,
+                          alt: event.target.value,
+                        },
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="architecture-cta-primary-label">Primary CTA label</Label>
+                  <Input
+                    id="architecture-cta-primary-label"
+                    value={content.cta.primaryCtaLabel}
+                    onChange={(event) =>
+                      updateSection("cta", (prev) => ({
+                        ...prev,
+                        primaryCtaLabel: event.target.value,
                       }))
                     }
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="architecture-cta-subtitle">Subtitle</Label>
+                  <Label htmlFor="architecture-cta-primary-href">Primary CTA link</Label>
                   <Input
-                    id="architecture-cta-subtitle"
-                    value={content.cta.subtitle}
+                    id="architecture-cta-primary-href"
+                    value={content.cta.primaryCtaHref}
                     onChange={(event) =>
                       updateSection("cta", (prev) => ({
                         ...prev,
-                        subtitle: event.target.value,
+                        primaryCtaHref: event.target.value,
                       }))
                     }
                   />

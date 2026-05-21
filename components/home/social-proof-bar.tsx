@@ -1,29 +1,39 @@
-import { Award, Briefcase, Globe, Users } from "lucide-react"
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
 
 type SocialProofContent = HomePageContent["socialProof"]
-
-const statIcons = [Award, Briefcase, Globe, Users]
 
 export function SocialProofBar({
   content = homePageDefaults.socialProof,
 }: {
   content?: SocialProofContent
 }) {
-  const stats = content.stats.map((stat, index) => ({
-    icon: statIcons[index] ?? Award,
-    value: stat.value,
-    label: stat.label,
-  }))
+  if (content.stats.length === 0) {
+    return null
+  }
+  const gridColsClass =
+    content.stats.length === 1
+      ? "grid-cols-1"
+      : content.stats.length === 2
+        ? "grid-cols-2"
+        : content.stats.length === 3
+          ? "grid-cols-1 md:grid-cols-3"
+          : "grid-cols-2 md:grid-cols-4"
 
   return (
-    <section className="border-y border-border bg-card">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-10 md:grid-cols-4 lg:px-8 stagger-children">
-        {stats.map((stat) => (
-          <div key={stat.label} className="animate-on-scroll flex flex-col items-center gap-2 text-center">
-            <stat.icon className="h-5 w-5 text-accent" />
-            <span className="font-serif text-2xl font-bold text-foreground md:text-3xl">{stat.value}</span>
-            <span className="text-sm text-muted-foreground">{stat.label}</span>
+    <section className="bg-background">
+      <div className={`mx-auto grid max-w-7xl gap-y-10 divide-border px-6 py-16 md:divide-x lg:px-10 ${gridColsClass}`}>
+        {content.stats.map((stat, index) => (
+          <div
+            key={`${stat.label}-${index}`}
+            className="animate-on-scroll flex flex-col items-start gap-2 px-0 md:px-8 first:md:pl-0 last:md:pr-0"
+          >
+            <span className="text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <p className="font-serif text-4xl font-light leading-none text-foreground md:text-5xl">
+              {stat.value}
+            </p>
+            <p className="text-sm font-light text-muted-foreground">{stat.label}</p>
           </div>
         ))}
       </div>

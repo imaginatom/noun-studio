@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { SiteLogo } from '@/components/site-logo'
 
 export default function AdminResetPasswordPage() {
   const router = useRouter()
@@ -92,6 +93,9 @@ export default function AdminResetPasswordPage() {
   return (
     <section className="mx-auto flex min-h-[70vh] w-full max-w-md items-center px-4 py-16">
       <div className="w-full rounded-2xl border border-border bg-card p-8 shadow-sm">
+        <div className="mb-6 flex justify-center">
+          <SiteLogo asLink={false} size="sm" />
+        </div>
         <div className="space-y-2 text-center">
           <p className="text-sm uppercase tracking-[0.3em] text-muted-foreground">
             Admin Access

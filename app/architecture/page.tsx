@@ -13,10 +13,9 @@ import {
   Hammer,
   PartyPopper,
   ArrowRight,
-  Palette,
   ChevronRight,
 } from "lucide-react"
-import { ContactForm } from "@/components/contact-form"
+import { ImageCtaSection } from "@/components/image-cta-section"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { mergeArchitectureContent } from "@/lib/content/architecture"
 
@@ -28,6 +27,7 @@ export const metadata: Metadata = {
 
 const serviceIcons = [Building2, Compass, PenTool, HardHat]
 const processIcons = [Mail, FileText, Hammer, PartyPopper]
+const crossLinkTargets = [{ href: "/realisations", icon: ClipboardList }]
 
 export default async function ArchitecturePage() {
   const supabase = await createSupabaseServerClient()
@@ -163,24 +163,7 @@ export default async function ArchitecturePage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-primary py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="flex flex-col items-center gap-12 lg:flex-row lg:gap-16">
-            <div className="text-center lg:w-1/2 lg:text-left">
-              <h2 className="font-serif text-3xl font-bold text-primary-foreground md:text-4xl text-balance">
-                {content.cta.title}
-              </h2>
-              <p className="mt-3 text-lg text-primary-foreground/80">{content.cta.subtitle}</p>
-            </div>
-            <div className="w-full lg:w-1/2">
-              <div className="rounded-2xl bg-background p-6 shadow-lg md:p-8">
-                <ContactForm />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ImageCtaSection content={content.cta} />
 
       {/* Cross-links */}
       <section className="border-t border-border py-16 lg:py-20">
@@ -191,40 +174,30 @@ export default async function ArchitecturePage() {
             </h2>
           </div>
           <div className="mt-10 grid gap-6 md:grid-cols-2">
-            <Link
-              href="/branding"
-              className="group flex items-center gap-6 rounded-2xl border border-border bg-card p-6 transition-all duration-300 ease-out hover:border-primary/30 hover:bg-card/80 hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                <Palette className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-serif text-lg font-bold text-foreground">
-                  {content.crossLinks.cards[0].title}
-                </h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {content.crossLinks.cards[0].description}
-                </p>
-              </div>
-              <ArrowRight className="ml-auto h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
-            </Link>
-            <Link
-              href="/realisations"
-              className="group flex items-center gap-6 rounded-2xl border border-border bg-card p-6 transition-all duration-300 ease-out hover:border-primary/30 hover:bg-card/80 hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                <ClipboardList className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-serif text-lg font-bold text-foreground">
-                  {content.crossLinks.cards[1].title}
-                </h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {content.crossLinks.cards[1].description}
-                </p>
-              </div>
-              <ArrowRight className="ml-auto h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
-            </Link>
+            {content.crossLinks.cards.map((card, index) => {
+              const target = crossLinkTargets[index] ?? crossLinkTargets[0]
+              const CrossLinkIcon = target.icon
+              return (
+                <Link
+                  key={`${target.href}-${card.title}`}
+                  href={target.href}
+                  className="group flex items-center gap-6 rounded-2xl border border-border bg-card p-6 transition-all duration-300 ease-out hover:border-primary/30 hover:bg-card/80 hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <CrossLinkIcon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-lg font-bold text-foreground">
+                      {card.title}
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {card.description}
+                    </p>
+                  </div>
+                  <ArrowRight className="ml-auto h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                </Link>
+              )
+            })}
           </div>
         </div>
       </section>

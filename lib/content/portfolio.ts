@@ -39,12 +39,12 @@ export const portfolioPageDefaults: PortfolioPageContent = {
     eyebrow: "Portfolio",
     title: "Nos Réalisations",
     subtitle:
-      "Projets d'architecture, d'identité visuelle et de design réalisés en Algérie et en France.",
+      "Projets d'architecture et de design réalisés en Algérie et en France.",
     breadcrumbHomeLabel: "Accueil",
     breadcrumbCurrentLabel: "Portfolio",
   },
   gallery: {
-    categories: ["Tous", "Architecture", "Branding", "Intérieur", "Rénovation"],
+    categories: ["Tous", "Architecture", "Intérieur", "Rénovation"],
     projects: [
       {
         title: "Villa Contemporaine",
@@ -58,13 +58,13 @@ export const portfolioPageDefaults: PortfolioPageContent = {
         },
       },
       {
-        title: "Branding Startup Tech",
-        description: "Logo, charte graphique et supports de communication pour une startup technologique.",
+        title: "Espace de Coworking",
+        description: "Aménagement et conception d'un espace de travail collaboratif.",
         location: "Oran",
-        category: "Branding",
+        category: "Intérieur",
         image: {
           src: "/images/gallery-2.jpg",
-          alt: "Identité visuelle pour startup par Noun Studio",
+          alt: "Espace de coworking par Noun Studio",
         },
       },
       {
@@ -109,13 +109,13 @@ export const portfolioPageDefaults: PortfolioPageContent = {
         },
       },
       {
-        title: "Branding Restaurant",
-        description: "Création d'identité complète pour un restaurant : du nom à la décoration intérieure.",
+        title: "Restaurant — Aménagement",
+        description: "Conception et décoration intérieure pour un restaurant.",
         location: "Oran",
-        category: "Branding",
+        category: "Intérieur",
         image: {
           src: "/images/elagage-hero.jpg",
-          alt: "Identité visuelle restaurant par Noun Studio",
+          alt: "Aménagement restaurant par Noun Studio",
         },
       },
       {
@@ -129,13 +129,13 @@ export const portfolioPageDefaults: PortfolioPageContent = {
         },
       },
       {
-        title: "Identité Cabinet Médical",
-        description: "Branding complet pour un cabinet médical : logo, signalétique et décoration intérieure.",
+        title: "Cabinet Médical",
+        description: "Conception et aménagement intérieur pour un cabinet médical.",
         location: "Constantine",
-        category: "Branding",
+        category: "Intérieur",
         image: {
           src: "/images/why-us.jpg",
-          alt: "Studio d'architecture Noun Studio",
+          alt: "Cabinet médical par Noun Studio",
         },
       },
       {
@@ -201,17 +201,18 @@ const mergeProjectList = (
   value: unknown,
 ): PortfolioPageContent["gallery"]["projects"] => {
   if (!Array.isArray(value)) {
-    return fallback
+    return []
   }
-  return fallback.map((item, index) => {
-    const entry = value[index]
+  const template = fallback[0]
+  return value.flatMap((entry, index) => {
     if (!isRecord(entry)) {
-      return item
+      return []
     }
+    const item = fallback[index] ?? template
     return {
       ...item,
       ...(entry as Partial<typeof item>),
-      image: mergeObject(item.image, entry.image),
+      image: mergeObject(item?.image ?? { src: "", alt: "" }, entry.image),
     }
   })
 }

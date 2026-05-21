@@ -1,76 +1,93 @@
-import Image from "next/image"
 import Link from "next/link"
-import { CheckCircle, ChevronDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ArrowDown, ArrowUpRight } from "lucide-react"
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
+import { HeroParallaxImage } from "@/components/home/hero-parallax-image"
 
 type HeroContent = HomePageContent["hero"]
 
 export function HeroSection({ content = homePageDefaults.hero }: { content?: HeroContent }) {
   return (
-    <section className="relative flex min-h-screen items-center overflow-hidden">
-      {/* Background Image */}
-      <Image
-        src={content.backgroundImage.src}
-        alt={content.backgroundImage.alt}
-        fill
-        priority
-        className="object-cover"
-        sizes="100vw"
+    <section className="relative flex min-h-screen flex-col justify-end overflow-hidden bg-foreground text-background">
+      <HeroParallaxImage src={content.backgroundImage.src} alt={content.backgroundImage.alt} />
+
+      <div className="absolute inset-0 bg-gradient-to-b from-foreground/40 via-foreground/20 to-foreground/85" />
+
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent via-foreground to-background"
+        aria-hidden="true"
       />
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/60 to-foreground/20" />
+      <div className="absolute left-6 top-32 z-10 hidden flex-col items-start gap-3 lg:flex lg:left-10">
+        <span className="rotate-180 text-[10px] uppercase tracking-[0.32em] text-background/60" style={{ writingMode: "vertical-rl" }}>
+          {content.badgeText}
+        </span>
+        <span className="h-16 w-px bg-background/30" aria-hidden="true" />
+      </div>
 
-      {/* Content */}
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-32 lg:px-8">
-        <div className="max-w-2xl animate-on-scroll is-visible" style={{ animationDelay: "200ms" }}>
-          {/* Badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-background/10 px-4 py-1.5 backdrop-blur-sm">
-            <span className="text-sm font-medium text-primary-foreground">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-40 lg:px-10 lg:pb-28">
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-8">
+            <p className="eyebrow !text-background/70 mb-8 lg:hidden">
               {content.badgeText}
-            </span>
+            </p>
+
+            <h1 className="font-serif text-5xl font-light leading-[1.02] tracking-tight text-balance text-background sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem]">
+              {content.title}
+            </h1>
+
+            <div className="mt-10 flex items-start gap-5 lg:max-w-xl">
+              <span className="mt-3 hidden h-px w-12 shrink-0 bg-background/50 sm:block" aria-hidden="true" />
+              <p className="text-base font-light leading-relaxed text-background/80 md:text-lg">
+                {content.subtitle}
+              </p>
+            </div>
           </div>
 
-          {/* H1 */}
-          <h1 className="font-serif text-4xl font-bold leading-tight text-background md:text-5xl lg:text-6xl text-balance">
-            {content.title}
-          </h1>
+          <div className="lg:col-span-4 lg:pt-8">
+            {content.trustBullets.length > 0 && (
+              <ul className="space-y-3 border-l border-background/20 pl-6">
+                {content.trustBullets.map((bullet) => (
+                  <li
+                    key={bullet}
+                    className="text-[13px] font-light tracking-wide text-background/80"
+                  >
+                    {bullet}
+                  </li>
+                ))}
+              </ul>
+            )}
 
-          {/* Subtitle */}
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-background/80 md:text-lg">
-            {content.subtitle}
-          </p>
-
-          {/* Trust Bullets */}
-          <ul className="mt-8 flex flex-col gap-2.5">
-            {content.trustBullets.map((bullet) => (
-              <li key={bullet} className="flex items-center gap-2.5 text-sm text-background/90">
-                <CheckCircle className="h-4 w-4 shrink-0 text-accent" />
-                {bullet}
-              </li>
-            ))}
-          </ul>
-
-          {/* CTAs */}
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg hover:shadow-xl transition-all">
-              <Link href="/contact" aria-label="D\u00e9couvrir nos services">
-                {content.primaryCtaLabel}
+            <div className="mt-10 flex flex-col gap-2">
+              <Link
+                href="/realisations"
+                aria-label="Voir le portfolio"
+                className="group inline-flex items-baseline justify-between gap-4 border-b border-background/30 py-3 text-sm tracking-wide transition-colors hover:border-background"
+              >
+                <span>{content.secondaryCtaLabel}</span>
+                <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={1.5} />
               </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="border-background/30 bg-transparent text-background hover:bg-background/10 hover:text-background transition-all">
-              <Link href="/realisations" aria-label="Voir le portfolio">
-                {content.secondaryCtaLabel}
+              <Link
+                href="/contact"
+                aria-label="Découvrir nos services"
+                className="group inline-flex items-baseline justify-between gap-4 border-b border-background/30 py-3 text-sm tracking-wide transition-colors hover:border-background"
+              >
+                <span>{content.primaryCtaLabel}</span>
+                <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={1.5} />
               </Link>
-            </Button>
+            </div>
           </div>
+        </div>
+
+        <div className="mt-16 flex items-end justify-between text-[10px] uppercase tracking-[0.3em] text-background/50">
+          <span>Oran · Algérie</span>
+          <span className="hidden md:inline-block">Studio fondé par SAHNOUNE Mohammed</span>
+          <span>{new Date().getFullYear()}</span>
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 animate-bounce" aria-hidden="true">
-        <ChevronDown className="h-6 w-6 text-background/60" />
+      <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-background/60" aria-hidden="true">
+        <span className="text-[10px] uppercase tracking-[0.3em]">Défiler</span>
+        <ArrowDown className="h-4 w-4 animate-bounce" strokeWidth={1.5} />
       </div>
     </section>
   )

@@ -15,6 +15,9 @@ import {
   type PortfolioPageContent,
   type PortfolioPageSectionKey,
 } from "@/lib/content/portfolio"
+import { diffOrphanedPaths } from "@/lib/content/image-paths"
+
+const SITE_IMAGES_BUCKET = "site-images"
 
 type SaveState = {
   isSaving: boolean
@@ -40,6 +43,17 @@ const updateListItem = <T,>(list: T[], index: number, value: T): T[] => {
   next[index] = value
   return next
 }
+
+const removeListItem = <T,>(list: T[], index: number): T[] =>
+  list.filter((_, i) => i !== index)
+
+const createEmptyProject = (): PortfolioPageContent["gallery"]["projects"][number] => ({
+  title: "",
+  description: "",
+  location: "",
+  category: "",
+  image: { src: "", alt: "", path: null },
+})
 
 export default function AdminPortfolioEditor() {
   const supabase = useMemo(() => createSupabaseBrowserClient(), [])
@@ -95,12 +109,12 @@ export default function AdminPortfolioEditor() {
 
   const saveSection = async (section: PortfolioPageSectionKey) => {
     setSectionState(section, { isSaving: true, message: null, error: null })
-    const payload = content[section]
-    const sortOrder = portfolioSectionOrder.indexOf(section)
+
+    const newContent = content[section]
 
     const { data: existing, error: fetchError } = await supabase
       .from("site_content")
-      .select("id")
+      .select("content")
       .eq("page", "portfolio")
       .eq("section", section)
       .maybeSingle()
@@ -108,22 +122,23 @@ export default function AdminPortfolioEditor() {
     if (fetchError) {
       setSectionState(section, {
         isSaving: false,
-        error: fetchError.message || "Unable to fetch content entry.",
+        error: fetchError.message || "Unable to load previous content.",
       })
       return
     }
 
-    const upsertPayload = {
-      page: "portfolio",
-      section,
-      content_type: "text",
-      content: payload,
-      sort_order: sortOrder,
-    }
-
-    const { error: saveError } = existing?.id
-      ? await supabase.from("site_content").update(upsertPayload).eq("id", existing.id)
-      : await supabase.from("site_content").insert(upsertPayload)
+    const { error: saveError } = await supabase
+      .from("site_content")
+      .upsert(
+        {
+          page: "portfolio",
+          section,
+          content_type: "text",
+          content: newContent,
+          sort_order: portfolioSectionOrder.indexOf(section),
+        },
+        { onConflict: "page,section" },
+      )
 
     if (saveError) {
       setSectionState(section, {
@@ -133,10 +148,17 @@ export default function AdminPortfolioEditor() {
       return
     }
 
-    setSectionState(section, {
-      isSaving: false,
-      message: "Saved successfully.",
-    })
+    const orphanedPaths = diffOrphanedPaths(existing?.content, newContent)
+    if (orphanedPaths.length > 0) {
+      const { error: removeError } = await supabase.storage
+        .from(SITE_IMAGES_BUCKET)
+        .remove(orphanedPaths)
+      if (removeError) {
+        console.warn("Failed to delete orphaned images:", removeError.message)
+      }
+    }
+
+    setSectionState(section, { isSaving: false, message: "Saved successfully." })
   }
 
   return (
@@ -276,8 +298,30 @@ export default function AdminPortfolioEditor() {
                 </div>
               </div>
               <div className="space-y-4">
+                {content.gallery.projects.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-border bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+                    No projects yet. Click &quot;Add project&quot; below to create one.
+                  </div>
+                ) : null}
                 {content.gallery.projects.map((project, index) => (
                   <div key={`portfolio-project-${index}`} className="space-y-4 rounded-lg border border-border p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-sm font-medium text-muted-foreground">Project {index + 1}</p>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() =>
+                            updateSection("gallery", (prev) => ({
+                              ...prev,
+                              projects: removeListItem(prev.projects, index),
+                            }))
+                          }
+                        >
+                          Remove
+                        </Button>
+                      </div>
                       <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                           <Label htmlFor={`portfolio-project-title-${index}`}>Project title</Label>
@@ -387,6 +431,20 @@ export default function AdminPortfolioEditor() {
                       />
                   </div>
                 ))}
+                <div className="flex justify-start">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() =>
+                      updateSection("gallery", (prev) => ({
+                        ...prev,
+                        projects: [...prev.projects, createEmptyProject()],
+                      }))
+                    }
+                  >
+                    + Add project
+                  </Button>
+                </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-between gap-3">

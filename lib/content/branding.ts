@@ -185,18 +185,19 @@ const mergeServiceList = (
   value: unknown,
 ): BrandingPageContent["services"]["items"] => {
   if (!Array.isArray(value)) {
-    return fallback
+    return []
   }
-  return fallback.map((item, index) => {
-    const entry = value[index]
+  const template = fallback[0]
+  return value.flatMap((entry, index) => {
     if (!isRecord(entry)) {
-      return item
+      return []
     }
+    const item = fallback[index] ?? template
     return {
       ...item,
       ...(entry as Partial<typeof item>),
-      features: mergeStringArray(item.features, entry.features),
-      image: mergeObject(item.image, entry.image),
+      features: mergeStringArray(item?.features ?? [], entry.features),
+      image: mergeObject(item?.image ?? { src: "", alt: "" }, entry.image),
     }
   })
 }
@@ -206,13 +207,14 @@ const mergeCardList = (
   value: unknown,
 ): BrandingPageContent["crossLinks"]["cards"] => {
   if (!Array.isArray(value)) {
-    return fallback
+    return []
   }
-  return fallback.map((item, index) => {
-    const entry = value[index]
+  const template = fallback[0]
+  return value.flatMap((entry, index) => {
     if (!isRecord(entry)) {
-      return item
+      return []
     }
+    const item = fallback[index] ?? template
     return {
       ...item,
       ...(entry as Partial<typeof item>),

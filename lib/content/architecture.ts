@@ -38,8 +38,14 @@ export type ArchitecturePageContent = {
     }>
   }
   cta: {
-    title: string
-    subtitle: string
+    phrase: string
+    backgroundImage: {
+      src: string
+      alt: string
+      path?: string | null
+    }
+    primaryCtaLabel: string
+    primaryCtaHref: string
   }
   crossLinks: {
     title: string
@@ -75,7 +81,7 @@ export const architecturePageDefaults: ArchitecturePageContent = {
   },
   intro: {
     title: "L'architecture au service de l'identité",
-    body: "Chez Noun Studio, l'architecture n'est pas seulement une question de construction technique. C'est une expression culturelle, un outil de branding et un médium de sensibilisation sociale. Chaque projet est conçu avec une attention particulière à l'identité du lieu et de ses habitants.",
+    body: "Chez Noun Studio, l'architecture n'est pas seulement une question de construction technique. C'est une expression culturelle et un médium de sensibilisation sociale. Chaque projet est conçu avec une attention particulière à l'identité du lieu et de ses habitants.",
   },
   services: {
     title: "Nos services d'architecture",
@@ -174,19 +180,21 @@ export const architecturePageDefaults: ArchitecturePageContent = {
     ],
   },
   cta: {
-    title: "Vous avez un projet architectural ?",
-    subtitle: "Décrivez-nous votre vision et recevez une consultation gratuite. Sans engagement.",
+    phrase:
+      "Concevons un espace à la hauteur de votre vision et ambitions",
+    backgroundImage: {
+      src: "/architecture-cta.png",
+      alt: "Projet architectural par Noun Studio",
+    },
+    primaryCtaLabel: "Discutons de votre projet",
+    primaryCtaHref: "/contact",
   },
   crossLinks: {
     title: "Nos autres expertises",
     cards: [
       {
-        title: "Identité Visuelle & Branding",
-        description: "Logos, chartes graphiques et systèmes d'identité pour entreprises et startups.",
-      },
-      {
         title: "Notre portfolio",
-        description: "Parcourez nos projets d'architecture, de branding et de design.",
+        description: "Parcourez nos projets d'architecture et de design.",
       },
     ],
   },
@@ -223,18 +231,19 @@ const mergeServiceList = (
   value: unknown,
 ): ArchitecturePageContent["services"]["items"] => {
   if (!Array.isArray(value)) {
-    return fallback
+    return []
   }
-  return fallback.map((item, index) => {
-    const entry = value[index]
+  const template = fallback[0]
+  return value.flatMap((entry, index) => {
     if (!isRecord(entry)) {
-      return item
+      return []
     }
+    const item = fallback[index] ?? template
     return {
       ...item,
       ...(entry as Partial<typeof item>),
-      features: mergeStringArray(item.features, entry.features),
-      image: mergeObject(item.image, entry.image),
+      features: mergeStringArray(item?.features ?? [], entry.features),
+      image: mergeObject(item?.image ?? { src: "", alt: "" }, entry.image),
     }
   })
 }
@@ -244,13 +253,14 @@ const mergeStepList = (
   value: unknown,
 ): ArchitecturePageContent["process"]["steps"] => {
   if (!Array.isArray(value)) {
-    return fallback
+    return []
   }
-  return fallback.map((item, index) => {
-    const entry = value[index]
+  const template = fallback[0]
+  return value.flatMap((entry, index) => {
     if (!isRecord(entry)) {
-      return item
+      return []
     }
+    const item = fallback[index] ?? template
     return {
       ...item,
       ...(entry as Partial<typeof item>),
@@ -263,13 +273,14 @@ const mergeCardList = (
   value: unknown,
 ): ArchitecturePageContent["crossLinks"]["cards"] => {
   if (!Array.isArray(value)) {
-    return fallback
+    return []
   }
-  return fallback.map((item, index) => {
-    const entry = value[index]
+  const template = fallback[0]
+  return value.flatMap((entry, index) => {
     if (!isRecord(entry)) {
-      return item
+      return []
     }
+    const item = fallback[index] ?? template
     return {
       ...item,
       ...(entry as Partial<typeof item>),
@@ -312,7 +323,21 @@ export const mergeArchitectureContent = (
         isRecord(processOverride) ? processOverride.steps : undefined,
       ),
     },
-    cta: mergeObject(architecturePageDefaults.cta, ctaOverride),
+    cta: (() => {
+      const merged = mergeObject(architecturePageDefaults.cta, ctaOverride)
+      const legacyPhrase =
+        isRecord(ctaOverride) && typeof ctaOverride.title === "string"
+          ? ctaOverride.title
+          : undefined
+      return {
+        ...merged,
+        phrase: merged.phrase || legacyPhrase || architecturePageDefaults.cta.phrase,
+        backgroundImage: mergeObject(
+          architecturePageDefaults.cta.backgroundImage,
+          isRecord(ctaOverride) ? ctaOverride.backgroundImage : undefined,
+        ),
+      }
+    })(),
     crossLinks: {
       ...mergeObject(architecturePageDefaults.crossLinks, crossLinksOverride),
       cards: mergeCardList(

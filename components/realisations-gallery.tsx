@@ -92,6 +92,10 @@ export function RealisationsGallery({ categories, projects }: RealisationsGaller
     return () => window.removeEventListener("keydown", handleKeyDown)
   })
 
+  if (projects.length === 0) {
+    return null
+  }
+
   return (
     <>
       {/* Filter tabs */}

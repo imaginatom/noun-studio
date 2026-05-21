@@ -3,8 +3,21 @@
 import { useState, type FormEvent } from "react"
 import { Send, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
-export function ContactForm() {
+const FIELD_BASE_CLASS =
+  "w-full rounded-lg border border-border px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary focus:shadow-sm"
+
+type ContactFormProps = {
+  /** Lighter fields for use on the #828281 contact CTA panel */
+  fieldsOnMutedPanel?: boolean
+}
+
+export function ContactForm({ fieldsOnMutedPanel = false }: ContactFormProps) {
+  const fieldClass = cn(
+    FIELD_BASE_CLASS,
+    fieldsOnMutedPanel ? "bg-[#949493]" : "bg-background",
+  )
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
@@ -44,7 +57,7 @@ export function ContactForm() {
             required
             placeholder="SAHNOUNE"
             aria-required="true"
-            className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary focus:shadow-sm"
+            className={fieldClass}
           />
         </div>
         <div>
@@ -58,7 +71,7 @@ export function ContactForm() {
             required
             placeholder="Mohammed"
             aria-required="true"
-            className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary focus:shadow-sm"
+            className={fieldClass}
           />
         </div>
       </div>
@@ -74,7 +87,7 @@ export function ContactForm() {
             required
             placeholder="votre@email.com"
             aria-required="true"
-            className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary focus:shadow-sm"
+            className={fieldClass}
           />
         </div>
         <div>
@@ -86,7 +99,7 @@ export function ContactForm() {
             name="telephone"
             type="tel"
             placeholder="+213 XX XX XX XX"
-            className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary focus:shadow-sm"
+            className={fieldClass}
           />
         </div>
       </div>
@@ -97,14 +110,13 @@ export function ContactForm() {
         <select
           id="form-service"
           name="service"
-          className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary focus:shadow-sm"
+          className={fieldClass}
           defaultValue=""
         >
           <option value="" disabled>{"S\u00e9lectionnez un type de projet"}</option>
           <option value="residential">{"Architecture r\u00e9sidentielle"}</option>
           <option value="commercial">{"Architecture commerciale"}</option>
           <option value="renovation">{"R\u00e9novation & Restauration"}</option>
-          <option value="branding">{"Identit\u00e9 visuelle & Branding"}</option>
           <option value="3d">{"Visualisation 3D"}</option>
           <option value="autre">{"Autre"}</option>
         </select>
@@ -120,7 +132,7 @@ export function ContactForm() {
           required
           placeholder={"D\u00e9crivez votre projet, le lieu, vos besoins et votre budget approximatif..."}
           aria-required="true"
-          className="w-full resize-none rounded-lg border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary focus:shadow-sm"
+          className={cn(fieldClass, "resize-none")}
         />
       </div>
       <Button

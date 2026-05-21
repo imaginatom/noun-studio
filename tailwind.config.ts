@@ -63,8 +63,11 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-dm-sans)'],
-        serif: ['var(--font-playfair)'],
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-display)', 'ui-serif', 'Georgia', 'serif'],
+      },
+      letterSpacing: {
+        widest: '0.22em',
       },
       borderRadius: {
         lg: 'var(--radius)',
