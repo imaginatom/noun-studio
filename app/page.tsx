@@ -72,7 +72,8 @@ export default async function HomePage() {
       <SectionTransition
         chapter="IV"
         label="Portfolio"
-        sectionBg="muted"
+        sectionBg="dark"
+        quote="Une sélection silencieuse. Six gestes, six lieux, six histoires."
       />
 
       <GalleryPreview content={content.galleryPreview} images={previewImages} />

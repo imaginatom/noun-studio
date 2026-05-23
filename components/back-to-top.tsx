@@ -14,6 +14,11 @@ export function BackToTop() {
   }, [])
 
   const scrollToTop = () => {
+    const lenis = typeof window !== "undefined" ? window.__lenis : undefined
+    if (lenis) {
+      lenis.scrollTo(0, { duration: 1.3 })
+      return
+    }
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 

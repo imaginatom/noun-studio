@@ -203,3 +203,189 @@ select
 where not exists (
   select 1 from public.site_content where page = 'home' and section = 'contactCta'
 );
+
+-- Architecture page content
+insert into public.site_content (page, section, content_type, content, sort_order)
+select
+  'architecture',
+  'hero',
+  'text',
+  '{
+    "title": "Architecture & Gestion de Projet",
+    "subtitle": "Du diagnostic à la livraison, un accompagnement complet pour vos projets architecturaux en Algérie et en France.",
+    "breadcrumbHomeLabel": "Accueil",
+    "breadcrumbCurrentLabel": "Architecture",
+    "backgroundImage": {
+      "src": "/images/paysagiste-hero.jpg",
+      "alt": "Plans architecturaux et maquettes chez Noun Studio",
+      "path": null
+    }
+  }'::jsonb,
+  0
+where not exists (
+  select 1 from public.site_content where page = 'architecture' and section = 'hero'
+);
+
+insert into public.site_content (page, section, content_type, content, sort_order)
+select
+  'architecture',
+  'philosophy',
+  'text',
+  '{
+    "label": "Philosophy",
+    "titleLines": ["UNE ARCHITECTURE", "PENSÉE AVEC", "INTENTION"],
+    "paragraphs": [
+      "Nous concevons des espaces contemporains où lumière, matière et fonction dialoguent avec équilibre et précision.",
+      "Chaque projet naît d''une compréhension profonde du lieu, des usages et de l''identité de celles et ceux qui l''habitent."
+    ]
+  }'::jsonb,
+  1
+where not exists (
+  select 1 from public.site_content where page = 'architecture' and section = 'philosophy'
+);
+
+insert into public.site_content (page, section, content_type, content, sort_order)
+select
+  'architecture',
+  'services',
+  'text',
+  '{
+    "label": "NOS EXPERTISES",
+    "items": [
+      {
+        "title": "Architecture résidentielle",
+        "description": "Conception de villas, maisons privées et espaces résidentiels pensés autour du confort, de la fluidité et de l''élégance contemporaine."
+      },
+      {
+        "title": "Architecture commerciale",
+        "description": "Création d''espaces professionnels, restaurants, boutiques et bureaux valorisant votre activité à travers une approche architecturale cohérente."
+      },
+      {
+        "title": "Architecture d''intérieur",
+        "description": "Des intérieurs où volumes, matières et lumière composent des espaces raffinés, fonctionnels et intemporels."
+      },
+      {
+        "title": "Rénovation & réhabilitation",
+        "description": "Transformation d''espaces existants avec une vision contemporaine respectueuse de l''identité et du caractère du lieu."
+      }
+    ]
+  }'::jsonb,
+  2
+where not exists (
+  select 1 from public.site_content where page = 'architecture' and section = 'services'
+);
+
+insert into public.site_content (page, section, content_type, content, sort_order)
+select
+  'architecture',
+  'process',
+  'text',
+  '{
+    "title": "NOTRE APPROCHE",
+    "steps": [
+      {
+        "step": "01",
+        "title": "Découverte",
+        "description": "Comprendre votre vision, les contraintes du projet et les usages du lieu."
+      },
+      {
+        "step": "02",
+        "title": "Concept",
+        "description": "Développer une direction architecturale forte, cohérente et adaptée à votre identité."
+      },
+      {
+        "step": "03",
+        "title": "Développement",
+        "description": "Affiner les espaces, matériaux et détails pour donner forme au projet."
+      },
+      {
+        "step": "04",
+        "title": "Réalisation",
+        "description": "Accompagner la concrétisation du projet avec précision et exigence."
+      }
+    ]
+  }'::jsonb,
+  3
+where not exists (
+  select 1 from public.site_content where page = 'architecture' and section = 'process'
+);
+
+insert into public.site_content (page, section, content_type, content, sort_order)
+select
+  'architecture',
+  'featuredProject',
+  'text',
+  '{
+    "label": "PROJET SÉLECTIONNÉ",
+    "title": "Villa Horizon",
+    "body": "Une architecture minimaliste pensée autour de la lumière, des perspectives et de la relation entre intérieur et extérieur.",
+    "href": "/realisations",
+    "image": {
+      "src": "/images/gallery-1.jpg",
+      "alt": "Villa Horizon — projet architectural par Noun Studio",
+      "path": null
+    }
+  }'::jsonb,
+  4
+where not exists (
+  select 1 from public.site_content where page = 'architecture' and section = 'featuredProject'
+);
+
+insert into public.site_content (page, section, content_type, content, sort_order)
+select
+  'architecture',
+  'values',
+  'text',
+  '{
+    "title": "NOTRE VISION",
+    "items": [
+      "Précision architecturale",
+      "Approche sur mesure",
+      "Sensibilité culturelle",
+      "Vision contemporaine",
+      "Attention au détail"
+    ]
+  }'::jsonb,
+  5
+where not exists (
+  select 1 from public.site_content where page = 'architecture' and section = 'values'
+);
+
+insert into public.site_content (page, section, content_type, content, sort_order)
+select
+  'architecture',
+  'cta',
+  'text',
+  '{
+    "phrase": "Concevons un espace à la hauteur de votre vision et ambitions",
+    "backgroundImage": {
+      "src": "/architecture-cta.png",
+      "alt": "Projet architectural par Noun Studio",
+      "path": null
+    },
+    "primaryCtaLabel": "Discutons de votre projet",
+    "primaryCtaHref": "/contact"
+  }'::jsonb,
+  6
+where not exists (
+  select 1 from public.site_content where page = 'architecture' and section = 'cta'
+);
+
+insert into public.site_content (page, section, content_type, content, sort_order)
+select
+  'architecture',
+  'crossLinks',
+  'text',
+  '{
+    "title": "Nos autres expertises",
+    "cards": [
+      {
+        "title": "Notre portfolio",
+        "description": "Parcourez nos projets d''architecture et de design."
+      }
+    ]
+  }'::jsonb,
+  7
+where not exists (
+  select 1 from public.site_content where page = 'architecture' and section = 'crossLinks'
+);

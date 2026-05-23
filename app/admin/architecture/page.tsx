@@ -287,46 +287,63 @@ export default function AdminArchitectureEditor() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Intro</CardTitle>
-              <CardDescription>Intro headline and supporting paragraph.</CardDescription>
+              <CardTitle>Philosophy</CardTitle>
+              <CardDescription>Section label, title lines, and paragraphs.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="architecture-intro-title">Title</Label>
+                <Label htmlFor="architecture-philosophy-label">Label</Label>
                 <Input
-                  id="architecture-intro-title"
-                  value={content.intro.title}
+                  id="architecture-philosophy-label"
+                  value={content.philosophy.label}
                   onChange={(event) =>
-                    updateSection("intro", (prev) => ({
+                    updateSection("philosophy", (prev) => ({
                       ...prev,
-                      title: event.target.value,
+                      label: event.target.value,
                     }))
                   }
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="architecture-intro-body">Body</Label>
-                <Textarea
-                  id="architecture-intro-body"
-                  value={content.intro.body}
-                  onChange={(event) =>
-                    updateSection("intro", (prev) => ({
-                      ...prev,
-                      body: event.target.value,
-                    }))
-                  }
-                />
+              <div className="space-y-3">
+                <Label>Title lines</Label>
+                {content.philosophy.titleLines.map((line, index) => (
+                  <Input
+                    key={`architecture-philosophy-line-${index}`}
+                    value={line}
+                    onChange={(event) =>
+                      updateSection("philosophy", (prev) => ({
+                        ...prev,
+                        titleLines: updateListItem(prev.titleLines, index, event.target.value),
+                      }))
+                    }
+                  />
+                ))}
+              </div>
+              <div className="space-y-3">
+                <Label>Paragraphs</Label>
+                {content.philosophy.paragraphs.map((paragraph, index) => (
+                  <Textarea
+                    key={`architecture-philosophy-paragraph-${index}`}
+                    value={paragraph}
+                    onChange={(event) =>
+                      updateSection("philosophy", (prev) => ({
+                        ...prev,
+                        paragraphs: updateListItem(prev.paragraphs, index, event.target.value),
+                      }))
+                    }
+                  />
+                ))}
               </div>
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-between gap-3">
-              <Button onClick={() => saveSection("intro")} disabled={saveStates.intro.isSaving}>
-                {saveStates.intro.isSaving ? "Saving..." : "Save intro"}
+              <Button onClick={() => saveSection("philosophy")} disabled={saveStates.philosophy.isSaving}>
+                {saveStates.philosophy.isSaving ? "Saving..." : "Save philosophy"}
               </Button>
-              {saveStates.intro.error ? (
-                <span className="text-sm text-destructive">{saveStates.intro.error}</span>
+              {saveStates.philosophy.error ? (
+                <span className="text-sm text-destructive">{saveStates.philosophy.error}</span>
               ) : null}
-              {saveStates.intro.message ? (
-                <span className="text-sm text-emerald-600">{saveStates.intro.message}</span>
+              {saveStates.philosophy.message ? (
+                <span className="text-sm text-emerald-600">{saveStates.philosophy.message}</span>
               ) : null}
             </CardFooter>
           </Card>
@@ -334,36 +351,21 @@ export default function AdminArchitectureEditor() {
           <Card>
             <CardHeader>
               <CardTitle>Services</CardTitle>
-              <CardDescription>Service cards, features, and images.</CardDescription>
+              <CardDescription>Expertise list (numbered items).</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="architecture-services-title">Title</Label>
-                  <Input
-                    id="architecture-services-title"
-                    value={content.services.title}
-                    onChange={(event) =>
-                      updateSection("services", (prev) => ({
-                        ...prev,
-                        title: event.target.value,
-                      }))
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="architecture-services-subtitle">Subtitle</Label>
-                  <Input
-                    id="architecture-services-subtitle"
-                    value={content.services.subtitle}
-                    onChange={(event) =>
-                      updateSection("services", (prev) => ({
-                        ...prev,
-                        subtitle: event.target.value,
-                      }))
-                    }
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="architecture-services-label">Section label</Label>
+                <Input
+                  id="architecture-services-label"
+                  value={content.services.label}
+                  onChange={(event) =>
+                    updateSection("services", (prev) => ({
+                      ...prev,
+                      label: event.target.value,
+                    }))
+                  }
+                />
               </div>
               <div className="space-y-4">
                 {content.services.items.map((service, index) => (
@@ -402,71 +404,6 @@ export default function AdminArchitectureEditor() {
                         />
                       </div>
                     </div>
-                    <div className="space-y-3">
-                      <Label>Features</Label>
-                      <div className="grid gap-3 md:grid-cols-2">
-                        {service.features.map((feature, featureIndex) => (
-                          <Input
-                            key={`architecture-service-${index}-feature-${featureIndex}`}
-                            value={feature}
-                            onChange={(event) =>
-                              updateSection("services", (prev) => ({
-                                ...prev,
-                                items: updateListItem(prev.items, index, {
-                                  ...service,
-                                  features: updateListItem(
-                                    service.features,
-                                    featureIndex,
-                                    event.target.value,
-                                  ),
-                                }),
-                              }))
-                            }
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <ImageUpload
-                        label="Service image"
-                        value={{
-                          src: service.image.src,
-                          path: service.image.path ?? null,
-                        }}
-                        onChange={(nextValue) =>
-                          updateSection("services", (prev) => ({
-                            ...prev,
-                            items: updateListItem(prev.items, index, {
-                              ...service,
-                              image: {
-                                ...service.image,
-                                src: nextValue.src,
-                                path: nextValue.path ?? null,
-                              },
-                            }),
-                          }))
-                        }
-                      />
-                      <div className="space-y-2">
-                        <Label htmlFor={`architecture-service-image-alt-${index}`}>Image alt text</Label>
-                        <Input
-                          id={`architecture-service-image-alt-${index}`}
-                          value={service.image.alt}
-                          onChange={(event) =>
-                            updateSection("services", (prev) => ({
-                              ...prev,
-                              items: updateListItem(prev.items, index, {
-                                ...service,
-                                image: {
-                                  ...service.image,
-                                  alt: event.target.value,
-                                },
-                              }),
-                            }))
-                          }
-                        />
-                      </div>
-                    </div>
                   </div>
                 ))}
               </div>
@@ -490,33 +427,18 @@ export default function AdminArchitectureEditor() {
               <CardDescription>Step labels and descriptions.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="architecture-process-title">Title</Label>
-                  <Input
-                    id="architecture-process-title"
-                    value={content.process.title}
-                    onChange={(event) =>
-                      updateSection("process", (prev) => ({
-                        ...prev,
-                        title: event.target.value,
-                      }))
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="architecture-process-subtitle">Subtitle</Label>
-                  <Input
-                    id="architecture-process-subtitle"
-                    value={content.process.subtitle}
-                    onChange={(event) =>
-                      updateSection("process", (prev) => ({
-                        ...prev,
-                        subtitle: event.target.value,
-                      }))
-                    }
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="architecture-process-title">Title</Label>
+                <Input
+                  id="architecture-process-title"
+                  value={content.process.title}
+                  onChange={(event) =>
+                    updateSection("process", (prev) => ({
+                      ...prev,
+                      title: event.target.value,
+                    }))
+                  }
+                />
               </div>
               <div className="space-y-4">
                 {content.process.steps.map((step, index) => (
@@ -584,6 +506,166 @@ export default function AdminArchitectureEditor() {
               ) : null}
               {saveStates.process.message ? (
                 <span className="text-sm text-emerald-600">{saveStates.process.message}</span>
+              ) : null}
+            </CardFooter>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Featured project</CardTitle>
+              <CardDescription>Highlighted project with image and link.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="architecture-featured-label">Label</Label>
+                  <Input
+                    id="architecture-featured-label"
+                    value={content.featuredProject.label}
+                    onChange={(event) =>
+                      updateSection("featuredProject", (prev) => ({
+                        ...prev,
+                        label: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="architecture-featured-href">Link</Label>
+                  <Input
+                    id="architecture-featured-href"
+                    value={content.featuredProject.href}
+                    onChange={(event) =>
+                      updateSection("featuredProject", (prev) => ({
+                        ...prev,
+                        href: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="architecture-featured-title">Title</Label>
+                <Input
+                  id="architecture-featured-title"
+                  value={content.featuredProject.title}
+                  onChange={(event) =>
+                    updateSection("featuredProject", (prev) => ({
+                      ...prev,
+                      title: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="architecture-featured-body">Description</Label>
+                <Textarea
+                  id="architecture-featured-body"
+                  value={content.featuredProject.body}
+                  onChange={(event) =>
+                    updateSection("featuredProject", (prev) => ({
+                      ...prev,
+                      body: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <ImageUpload
+                  label="Project image"
+                  value={{
+                    src: content.featuredProject.image.src,
+                    path: content.featuredProject.image.path ?? null,
+                  }}
+                  onChange={(nextValue) =>
+                    updateSection("featuredProject", (prev) => ({
+                      ...prev,
+                      image: {
+                        ...prev.image,
+                        src: nextValue.src,
+                        path: nextValue.path ?? null,
+                      },
+                    }))
+                  }
+                />
+                <div className="space-y-2">
+                  <Label htmlFor="architecture-featured-image-alt">Image alt text</Label>
+                  <Input
+                    id="architecture-featured-image-alt"
+                    value={content.featuredProject.image.alt}
+                    onChange={(event) =>
+                      updateSection("featuredProject", (prev) => ({
+                        ...prev,
+                        image: {
+                          ...prev.image,
+                          alt: event.target.value,
+                        },
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-wrap items-center justify-between gap-3">
+              <Button
+                onClick={() => saveSection("featuredProject")}
+                disabled={saveStates.featuredProject.isSaving}
+              >
+                {saveStates.featuredProject.isSaving ? "Saving..." : "Save featured project"}
+              </Button>
+              {saveStates.featuredProject.error ? (
+                <span className="text-sm text-destructive">{saveStates.featuredProject.error}</span>
+              ) : null}
+              {saveStates.featuredProject.message ? (
+                <span className="text-sm text-emerald-600">{saveStates.featuredProject.message}</span>
+              ) : null}
+            </CardFooter>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Values</CardTitle>
+              <CardDescription>Vision title and value items.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="architecture-values-title">Title</Label>
+                <Input
+                  id="architecture-values-title"
+                  value={content.values.title}
+                  onChange={(event) =>
+                    updateSection("values", (prev) => ({
+                      ...prev,
+                      title: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+              <div className="space-y-3">
+                <Label>Items</Label>
+                {content.values.items.map((item, index) => (
+                  <Input
+                    key={`architecture-value-${index}`}
+                    value={item}
+                    onChange={(event) =>
+                      updateSection("values", (prev) => ({
+                        ...prev,
+                        items: updateListItem(prev.items, index, event.target.value),
+                      }))
+                    }
+                  />
+                ))}
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-wrap items-center justify-between gap-3">
+              <Button onClick={() => saveSection("values")} disabled={saveStates.values.isSaving}>
+                {saveStates.values.isSaving ? "Saving..." : "Save values"}
+              </Button>
+              {saveStates.values.error ? (
+                <span className="text-sm text-destructive">{saveStates.values.error}</span>
+              ) : null}
+              {saveStates.values.message ? (
+                <span className="text-sm text-emerald-600">{saveStates.values.message}</span>
               ) : null}
             </CardFooter>
           </Card>

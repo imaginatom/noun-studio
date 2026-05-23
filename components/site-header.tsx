@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
@@ -20,26 +20,65 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ]
 
+const SCROLL_DELTA = 8
+
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false)
+  const [headerVisible, setHeaderVisible] = useState(true)
   const [sheetOpen, setSheetOpen] = useState(false)
+  const lastScrollY = useRef(0)
+  const frame = useRef<number | null>(null)
   const pathname = usePathname()
   const isHome = pathname === "/"
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener("scroll", handleScroll)
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
+    const update = () => {
+      const currentY = window.scrollY
+      const delta = currentY - lastScrollY.current
+
+      setScrolled(currentY > 20)
+
+      if (!prefersReducedMotion) {
+        if (currentY <= 20) {
+          setHeaderVisible(true)
+        } else if (Math.abs(delta) >= SCROLL_DELTA) {
+          setHeaderVisible(delta < 0)
+        }
+      }
+
+      lastScrollY.current = currentY
+      frame.current = null
+    }
+
+    const onScroll = () => {
+      if (frame.current !== null) return
+      frame.current = window.requestAnimationFrame(update)
+    }
+
+    update()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      if (frame.current !== null) {
+        window.cancelAnimationFrame(frame.current)
+      }
+    }
   }, [])
 
-  const isTransparent = isHome && !scrolled
+  const showHeader = sheetOpen || headerVisible
+  const isTransparent = isHome && !scrolled && showHeader
 
   return (
     <header
       role="banner"
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+        "fixed top-0 left-0 right-0 z-50",
+        "transition-[transform,background-color,padding,border-color] duration-300 ease-in-out",
+        !showHeader && "-translate-y-full",
         isTransparent
           ? "bg-transparent py-6"
           : "bg-background/85 backdrop-blur-xl py-4 border-b border-border/60",

@@ -10,32 +10,40 @@ export type ArchitecturePageContent = {
       path?: string | null
     }
   }
-  intro: {
-    title: string
-    body: string
+  philosophy: {
+    label: string
+    titleLines: string[]
+    paragraphs: string[]
   }
   services: {
-    title: string
-    subtitle: string
+    label: string
     items: Array<{
       title: string
       description: string
-      features: string[]
-      image: {
-        src: string
-        alt: string
-        path?: string | null
-      }
     }>
   }
   process: {
     title: string
-    subtitle: string
     steps: Array<{
       step: string
       title: string
       description: string
     }>
+  }
+  featuredProject: {
+    label: string
+    title: string
+    body: string
+    href: string
+    image: {
+      src: string
+      alt: string
+      path?: string | null
+    }
+  }
+  values: {
+    title: string
+    items: string[]
   }
   cta: {
     phrase: string
@@ -60,9 +68,11 @@ export type ArchitecturePageSectionKey = keyof ArchitecturePageContent
 
 export const architectureSectionOrder: ArchitecturePageSectionKey[] = [
   "hero",
-  "intro",
+  "philosophy",
   "services",
   "process",
+  "featuredProject",
+  "values",
   "cta",
   "crossLinks",
 ]
@@ -79,109 +89,90 @@ export const architecturePageDefaults: ArchitecturePageContent = {
       alt: "Plans architecturaux et maquettes chez Noun Studio",
     },
   },
-  intro: {
-    title: "L'architecture au service de l'identité",
-    body: "Chez Noun Studio, l'architecture n'est pas seulement une question de construction technique. C'est une expression culturelle et un médium de sensibilisation sociale. Chaque projet est conçu avec une attention particulière à l'identité du lieu et de ses habitants.",
+  philosophy: {
+    label: "Philosophy",
+    titleLines: ["UNE ARCHITECTURE", "PENSÉE AVEC", "INTENTION"],
+    paragraphs: [
+      "Nous concevons des espaces contemporains où lumière, matière et fonction dialoguent avec équilibre et précision.",
+      "Chaque projet naît d'une compréhension profonde du lieu, des usages et de l'identité de celles et ceux qui l'habitent.",
+    ],
   },
   services: {
-    title: "Nos services d'architecture",
-    subtitle: "Un cycle complet de conception et de réalisation architecturale",
+    label: "NOS EXPERTISES",
     items: [
       {
         title: "Architecture résidentielle",
         description:
-          "Conception de maisons individuelles, villas et résidences. Nous créons des espaces de vie qui reflètent votre identité tout en répondant aux exigences techniques et réglementaires locales.",
-        features: [
-          "Diagnostic et étude de faisabilité",
-          "Plans architecturaux complets",
-          "Visualisation 3D photoréaliste",
-          "Documentation réglementaire et administrative",
-        ],
-        image: {
-          src: "/images/gallery-1.jpg",
-          alt: "Villa résidentielle contemporaine conçue par Noun Studio",
-        },
+          "Conception de villas, maisons privées et espaces résidentiels pensés autour du confort, de la fluidité et de l'élégance contemporaine.",
       },
       {
-        title: "Espaces commerciaux",
+        title: "Architecture commerciale",
         description:
-          "Aménagement d'espaces professionnels, boutiques, restaurants et bureaux. Nous concevons des environnements qui renforcent votre image de marque et optimisent l'expérience de vos clients et collaborateurs.",
-        features: [
-          "Conception d'espaces de vente",
-          "Aménagement de bureaux et coworking",
-          "Design de restaurants et cafés",
-          "Intégration de l'identité de marque",
-        ],
-        image: {
-          src: "/images/gallery-3.jpg",
-          alt: "Espace commercial moderne aménagé par Noun Studio",
-        },
+          "Création d'espaces professionnels, restaurants, boutiques et bureaux valorisant votre activité à travers une approche architecturale cohérente.",
       },
       {
-        title: "Rénovation & Restauration",
+        title: "Architecture d'intérieur",
         description:
-          "Modernisation de bâtiments existants dans le respect du patrimoine. Nous allions techniques contemporaines et sensibilité historique pour redonner vie à des espaces tout en préservant leur caractère.",
-        features: [
-          "Diagnostic de l'état existant",
-          "Respect du patrimoine architectural",
-          "Intégration d'éléments contemporains",
-          "Réhabilitation et mise aux normes",
-        ],
-        image: {
-          src: "/images/gallery-4.jpg",
-          alt: "Rénovation patrimoniale avec éléments contemporains par Noun Studio",
-        },
+          "Des intérieurs où volumes, matières et lumière composent des espaces raffinés, fonctionnels et intemporels.",
       },
       {
-        title: "Suivi de chantier",
+        title: "Rénovation & réhabilitation",
         description:
-          "Accompagnement rigoureux de la construction, du premier coup de pioche à la réception finale. Nous assurons le respect des plans, des délais et du budget avec une documentation transparente à chaque étape.",
-        features: [
-          "Supervision de la construction",
-          "Contrôle qualité continu",
-          "Coordination des corps de métier",
-          "Documentation photographique du chantier",
-        ],
-        image: {
-          src: "/images/gallery-5.jpg",
-          alt: "Suivi de chantier architectural par Noun Studio",
-        },
+          "Transformation d'espaces existants avec une vision contemporaine respectueuse de l'identité et du caractère du lieu.",
       },
     ],
   },
   process: {
-    title: "Notre processus",
-    subtitle: "De la première consultation à la livraison, un accompagnement en 4 étapes.",
+    title: "NOTRE APPROCHE",
     steps: [
       {
         step: "01",
-        title: "Consultation",
+        title: "Découverte",
         description:
-          "Prise de contact et échange sur votre projet. Nous analysons vos besoins, votre terrain et votre budget pour définir le cadre du projet.",
+          "Comprendre votre vision, les contraintes du projet et les usages du lieu.",
       },
       {
         step: "02",
-        title: "Conception",
+        title: "Concept",
         description:
-          "Esquisses, plans détaillés et visualisations 3D. Nous itons ensemble jusqu'à obtenir le design qui vous correspond parfaitement.",
+          "Développer une direction architecturale forte, cohérente et adaptée à votre identité.",
       },
       {
         step: "03",
-        title: "Réalisation",
+        title: "Développement",
         description:
-          "Suivi rigoureux de la construction avec coordination des intervenants, contrôle qualité et respect des délais annoncés.",
+          "Affiner les espaces, matériaux et détails pour donner forme au projet.",
       },
       {
         step: "04",
-        title: "Livraison",
+        title: "Réalisation",
         description:
-          "Réception du projet, vérification finale et remise des documents. Vous profitez de votre nouvel espace en toute sérénité.",
+          "Accompagner la concrétisation du projet avec précision et exigence.",
       },
     ],
   },
+  featuredProject: {
+    label: "PROJET SÉLECTIONNÉ",
+    title: "Villa Horizon",
+    body: "Une architecture minimaliste pensée autour de la lumière, des perspectives et de la relation entre intérieur et extérieur.",
+    href: "/realisations",
+    image: {
+      src: "/images/gallery-1.jpg",
+      alt: "Villa Horizon — projet architectural par Noun Studio",
+    },
+  },
+  values: {
+    title: "NOTRE VISION",
+    items: [
+      "Précision architecturale",
+      "Approche sur mesure",
+      "Sensibilité culturelle",
+      "Vision contemporaine",
+      "Attention au détail",
+    ],
+  },
   cta: {
-    phrase:
-      "Concevons un espace à la hauteur de votre vision et ambitions",
+    phrase: "Concevons un espace à la hauteur de votre vision et ambitions",
     backgroundImage: {
       src: "/architecture-cta.png",
       alt: "Projet architectural par Noun Studio",
@@ -226,12 +217,40 @@ const mergeStringArray = (fallback: string[], value: unknown): string[] => {
   return allStrings ? (value as string[]) : fallback
 }
 
+const mergePhilosophy = (
+  fallback: ArchitecturePageContent["philosophy"],
+  value: unknown,
+  legacyIntro?: unknown,
+): ArchitecturePageContent["philosophy"] => {
+  const source = isRecord(value) ? value : isRecord(legacyIntro) ? legacyIntro : undefined
+  if (!source) {
+    return fallback
+  }
+  const legacyTitle = typeof source.title === "string" ? source.title : undefined
+  const legacyBody = typeof source.body === "string" ? source.body : undefined
+  const merged = mergeObject(fallback, source)
+  return {
+    ...merged,
+    titleLines: mergeStringArray(
+      fallback.titleLines,
+      source.titleLines ?? (legacyTitle ? legacyTitle.split("\n").map((line) => line.trim()).filter(Boolean) : undefined),
+    ),
+    paragraphs: mergeStringArray(
+      fallback.paragraphs,
+      source.paragraphs ??
+        (legacyBody
+          ? legacyBody.split(/\n\n+/).map((p) => p.trim()).filter(Boolean)
+          : undefined),
+    ),
+  }
+}
+
 const mergeServiceList = (
   fallback: ArchitecturePageContent["services"]["items"],
   value: unknown,
 ): ArchitecturePageContent["services"]["items"] => {
   if (!Array.isArray(value)) {
-    return []
+    return fallback
   }
   const template = fallback[0]
   return value.flatMap((entry, index) => {
@@ -240,10 +259,8 @@ const mergeServiceList = (
     }
     const item = fallback[index] ?? template
     return {
-      ...item,
-      ...(entry as Partial<typeof item>),
-      features: mergeStringArray(item?.features ?? [], entry.features),
-      image: mergeObject(item?.image ?? { src: "", alt: "" }, entry.image),
+      title: typeof entry.title === "string" ? entry.title : item.title,
+      description: typeof entry.description === "string" ? entry.description : item.description,
     }
   })
 }
@@ -253,7 +270,7 @@ const mergeStepList = (
   value: unknown,
 ): ArchitecturePageContent["process"]["steps"] => {
   if (!Array.isArray(value)) {
-    return []
+    return fallback
   }
   const template = fallback[0]
   return value.flatMap((entry, index) => {
@@ -273,7 +290,7 @@ const mergeCardList = (
   value: unknown,
 ): ArchitecturePageContent["crossLinks"]["cards"] => {
   if (!Array.isArray(value)) {
-    return []
+    return fallback
   }
   const template = fallback[0]
   return value.flatMap((entry, index) => {
@@ -294,11 +311,20 @@ export const mergeArchitectureContent = (
   const contentBySection = new Map(entries.map((entry) => [entry.section, entry.content]))
 
   const heroOverride = contentBySection.get("hero")
+  const philosophyOverride = contentBySection.get("philosophy")
   const introOverride = contentBySection.get("intro")
   const servicesOverride = contentBySection.get("services")
   const processOverride = contentBySection.get("process")
+  const featuredOverride = contentBySection.get("featuredProject")
+  const valuesOverride = contentBySection.get("values")
   const ctaOverride = contentBySection.get("cta")
   const crossLinksOverride = contentBySection.get("crossLinks")
+
+  const servicesMerged = mergeObject(architecturePageDefaults.services, servicesOverride)
+  const legacyServicesTitle =
+    isRecord(servicesOverride) && typeof servicesOverride.title === "string"
+      ? servicesOverride.title
+      : undefined
 
   return {
     hero: {
@@ -308,9 +334,13 @@ export const mergeArchitectureContent = (
         isRecord(heroOverride) ? heroOverride.backgroundImage : undefined,
       ),
     },
-    intro: mergeObject(architecturePageDefaults.intro, introOverride),
+    philosophy: mergePhilosophy(
+      architecturePageDefaults.philosophy,
+      philosophyOverride,
+      introOverride,
+    ),
     services: {
-      ...mergeObject(architecturePageDefaults.services, servicesOverride),
+      label: servicesMerged.label || legacyServicesTitle || architecturePageDefaults.services.label,
       items: mergeServiceList(
         architecturePageDefaults.services.items,
         isRecord(servicesOverride) ? servicesOverride.items : undefined,
@@ -321,6 +351,20 @@ export const mergeArchitectureContent = (
       steps: mergeStepList(
         architecturePageDefaults.process.steps,
         isRecord(processOverride) ? processOverride.steps : undefined,
+      ),
+    },
+    featuredProject: {
+      ...mergeObject(architecturePageDefaults.featuredProject, featuredOverride),
+      image: mergeObject(
+        architecturePageDefaults.featuredProject.image,
+        isRecord(featuredOverride) ? featuredOverride.image : undefined,
+      ),
+    },
+    values: {
+      ...mergeObject(architecturePageDefaults.values, valuesOverride),
+      items: mergeStringArray(
+        architecturePageDefaults.values.items,
+        isRecord(valuesOverride) ? valuesOverride.items : undefined,
       ),
     },
     cta: (() => {

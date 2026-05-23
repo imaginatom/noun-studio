@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { FloatingCTA } from "@/components/floating-cta"
 import { BackToTop } from "@/components/back-to-top"
 import { ScrollAnimations } from "@/components/scroll-animations"
+import { SmoothScroll } from "@/components/smooth-scroll"
 import "./globals.css"
 
 const inter = Inter({
@@ -24,7 +25,7 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://noun-studio-xs17.vercel.app"),
+  metadataBase: new URL("https://noun-studio.com"),
   title: {
     default: "Noun Studio | Cabinet d'architecture \u00e0 Oran",
     template: "%s | Noun Studio",
@@ -87,14 +88,14 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Architect",
   name: "Noun Studio",
-  image: "https://noun-studio-xs17.vercel.app/images/og-image.jpg",
+  image: "https://noun-studio.com/images/og-image.jpg",
   email: "contact@nounstudio.dz",
   founder: {
     "@type": "Person",
     name: "SAHNOUNE Mohammed",
     jobTitle: "Architecte & Directeur Cr\u00e9atif",
   },
-  url: "https://noun-studio-xs17.vercel.app",
+  url: "https://noun-studio.com",
   description:
     "Cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture et contenu culturel.",
   address: {
@@ -121,6 +122,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
+        <SmoothScroll />
         <SiteHeader />
         <main id="main-content">{children}</main>
         <SiteFooter />
