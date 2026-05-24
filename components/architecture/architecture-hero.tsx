@@ -11,7 +11,10 @@ export function ArchitectureHero({
   content?: HeroContent
 }) {
   return (
-    <section className="relative flex min-h-screen flex-col justify-end overflow-hidden bg-foreground text-background">
+    <section
+      data-snap-soft
+      className="relative flex min-h-screen flex-col justify-end overflow-hidden bg-foreground text-background"
+    >
       <HeroParallaxImage src={content.backgroundImage.src} alt={content.backgroundImage.alt} />
 
       <div className="absolute inset-0 bg-gradient-to-b from-foreground/40 via-foreground/20 to-foreground/85" />

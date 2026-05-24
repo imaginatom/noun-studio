@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { ImageCtaContent } from "@/components/image-cta-section"
+import { Parallax } from "@/components/motion"
 type ArchitectureCtaSectionProps = {
   content: ImageCtaContent
   chapter?: string
@@ -45,15 +46,17 @@ export function ArchitectureCtaSection({
   quote = "Chaque projet débute par une conversation. Parlons du vôtre.",
 }: ArchitectureCtaSectionProps) {
   return (
-    <section className="relative overflow-hidden py-20 lg:py-28">
-      <Image
-        src={content.backgroundImage.src}
-        alt={content.backgroundImage.alt}
-        fill
-        className="object-cover"
-        sizes="100vw"
-        priority={false}
-      />
+    <section data-snap-soft className="relative overflow-hidden py-20 lg:py-28">
+      <Parallax y={-0.12} scaleFrom={0.06} className="absolute inset-0">
+        <Image
+          src={content.backgroundImage.src}
+          alt={content.backgroundImage.alt}
+          fill
+          className="object-cover"
+          sizes="100vw"
+          priority={false}
+        />
+      </Parallax>
       <div className="absolute inset-0 bg-foreground/35" aria-hidden="true" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-10">

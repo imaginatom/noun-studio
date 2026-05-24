@@ -5,8 +5,17 @@ import { ExpertiseVideo } from "@/components/home/expertise-video"
 /** Background of the content section that follows this transition */
 export type SectionTransitionBg = "background" | "muted" | "whyUs" | "dark"
 
-const WHY_US_SECTION_BG =
-  "color-mix(in srgb, hsl(var(--muted)) 40%, hsl(var(--background)) 60%)"
+export type SectionChapterIntroProps = {
+  chapter: string
+  label?: string
+  quote?: string
+  videoSrc?: string
+  isDark?: boolean
+  align?: "center" | "left"
+  /** Adds spacing before the section body when nested inside a parent section */
+  embedded?: boolean
+  className?: string
+}
 
 type SectionTransitionProps = {
   chapter: string
@@ -16,6 +25,8 @@ type SectionTransitionProps = {
   /** @deprecated Use sectionBg instead */
   tone?: "light" | "dark"
   sectionBg?: SectionTransitionBg
+  isDark?: boolean
+  align?: "center" | "left"
   className?: string
 }
 
@@ -32,8 +43,7 @@ function sectionSurfaceClasses(sectionBg: SectionTransitionBg): {
       }
     case "whyUs":
       return {
-        className: "text-foreground",
-        style: { backgroundColor: WHY_US_SECTION_BG },
+        className: "bg-transparent text-foreground",
         isDark: false,
       }
     case "dark":
@@ -108,32 +118,29 @@ function ChapterHeader({
   )
 }
 
-export function SectionTransition({
+export function SectionChapterIntro({
   chapter,
   label,
   quote,
   videoSrc,
-  tone,
-  sectionBg,
+  isDark = false,
+  align,
+  embedded = false,
   className,
-}: SectionTransitionProps) {
-  const resolvedBg: SectionTransitionBg =
-    sectionBg ?? (tone === "dark" ? "dark" : "background")
-  const surface = sectionSurfaceClasses(resolvedBg)
-  const isDark = surface.isDark
+}: SectionChapterIntroProps) {
   const hasSplitMedia = Boolean(videoSrc && quote)
+  const resolvedAlign = align ?? (hasSplitMedia ? "left" : "center")
 
   return (
-    <section
+    <div
       className={cn(
         "relative w-full overflow-hidden",
         isDark ? "pt-32 lg:pt-40" : "pt-20 lg:pt-28",
-        surface.className,
+        embedded && (hasSplitMedia ? "pb-16 lg:pb-20" : "pb-12 lg:pb-16"),
         className,
       )}
-      style={surface.style}
     >
-      {resolvedBg === "dark" && (
+      {isDark && (
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background to-black"
@@ -167,10 +174,17 @@ export function SectionTransition({
         </div>
       ) : (
         <div
-          aria-hidden="true"
-          className="animate-on-scroll animate-fade relative mx-auto flex max-w-5xl flex-col items-center px-6 text-center lg:px-10"
+          className={cn(
+            "animate-on-scroll animate-fade relative mx-auto flex max-w-5xl flex-col px-6 lg:px-10",
+            resolvedAlign === "center" ? "items-center text-center" : "items-start text-left",
+          )}
         >
-          <ChapterHeader chapter={chapter} label={label} isDark={isDark} />
+          <ChapterHeader
+            chapter={chapter}
+            label={label}
+            isDark={isDark}
+            align={resolvedAlign}
+          />
 
           {quote && (
             <p
@@ -184,6 +198,39 @@ export function SectionTransition({
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+export function SectionTransition({
+  chapter,
+  label,
+  quote,
+  videoSrc,
+  tone,
+  sectionBg,
+  className,
+  isDark: isDarkProp,
+  align,
+}: SectionTransitionProps) {
+  const resolvedBg: SectionTransitionBg =
+    sectionBg ?? (tone === "dark" ? "dark" : "background")
+  const surface = sectionSurfaceClasses(resolvedBg)
+  const isDark = isDarkProp ?? surface.isDark
+
+  return (
+    <section
+      className={cn("relative w-full overflow-hidden", surface.className, className)}
+      style={surface.style}
+    >
+      <SectionChapterIntro
+        chapter={chapter}
+        label={label}
+        quote={quote}
+        videoSrc={videoSrc}
+        isDark={isDark}
+        align={align}
+      />
     </section>
   )
 }

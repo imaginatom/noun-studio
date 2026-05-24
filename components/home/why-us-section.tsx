@@ -2,29 +2,39 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
+import { SectionChapterIntro } from "@/components/home/section-transition"
+import { cn } from "@/lib/utils"
 
 type WhyUsContent = HomePageContent["whyUs"]
 
-/** Opaque equivalent of bg-muted/40 over the page background */
-const whyUsSectionBg =
-  "color-mix(in srgb, hsl(var(--muted)) 40%, hsl(var(--background)) 60%)"
+const sectionBg = "#F9F8F6"
 
 export function WhyUsSection({
   content = homePageDefaults.whyUs,
+  chapter,
+  chapterLabel,
 }: {
   content?: WhyUsContent
+  chapter?: string
+  chapterLabel?: string
 }) {
   return (
-    <section
-      className="py-24 lg:py-32"
-      style={{ backgroundColor: whyUsSectionBg }}
-    >
+    <section className="approche-band relative">
+      {chapter && (
+        <SectionChapterIntro
+          chapter={chapter}
+          label={chapterLabel}
+          embedded
+          className="bg-transparent"
+        />
+      )}
+      <div className={cn("pb-24 lg:pb-32", !chapter && "pt-24 lg:pt-32")}>
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="animate-on-scroll animate-fade-left relative lg:col-span-6">
             <div
               className="relative aspect-[4/5] overflow-hidden"
-              style={{ backgroundColor: whyUsSectionBg }}
+              style={{ backgroundColor: sectionBg }}
             >
               <Image
                 src={content.image.src}
@@ -40,31 +50,31 @@ export function WhyUsSection({
                 <div
                   className="absolute inset-y-0 left-0 w-[22%]"
                   style={{
-                    background: `linear-gradient(to right, ${whyUsSectionBg}, transparent)`,
+                    background: `linear-gradient(to right, ${sectionBg}, transparent)`,
                   }}
                 />
                 <div
                   className="absolute inset-y-0 right-0 w-[22%]"
                   style={{
-                    background: `linear-gradient(to left, ${whyUsSectionBg}, transparent)`,
+                    background: `linear-gradient(to left, ${sectionBg}, transparent)`,
                   }}
                 />
                 <div
                   className="absolute inset-x-0 top-0 h-[18%]"
                   style={{
-                    background: `linear-gradient(to bottom, ${whyUsSectionBg}, transparent)`,
+                    background: `linear-gradient(to bottom, ${sectionBg}, transparent)`,
                   }}
                 />
                 <div
                   className="absolute inset-x-0 bottom-0 h-[18%]"
                   style={{
-                    background: `linear-gradient(to top, ${whyUsSectionBg}, transparent)`,
+                    background: `linear-gradient(to top, ${sectionBg}, transparent)`,
                   }}
                 />
                 <div
                   className="absolute inset-0"
                   style={{
-                    background: `radial-gradient(ellipse 80% 75% at 50% 50%, transparent 42%, ${whyUsSectionBg} 100%)`,
+                    background: `radial-gradient(ellipse 80% 75% at 50% 50%, transparent 42%, ${sectionBg} 100%)`,
                   }}
                 />
               </div>
@@ -110,6 +120,7 @@ export function WhyUsSection({
             </div>
           </div>
         </div>
+      </div>
       </div>
     </section>
   )

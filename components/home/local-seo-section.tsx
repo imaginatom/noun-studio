@@ -1,15 +1,29 @@
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
+import { SectionChapterIntro } from "@/components/home/section-transition"
+import { cn } from "@/lib/utils"
 
 type LocalSeoContent = HomePageContent["localSeo"]
 
 export function LocalSeoSection({
   content = homePageDefaults.localSeo,
+  chapter,
+  chapterLabel,
 }: {
   content?: LocalSeoContent
+  chapter?: string
+  chapterLabel?: string
 }) {
   return (
-    <section className="bg-background py-24 lg:py-32">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10">
+    <section className="bg-background">
+      {chapter && (
+        <SectionChapterIntro chapter={chapter} label={chapterLabel} embedded />
+      )}
+      <div
+        className={cn(
+          "mx-auto max-w-7xl px-6 lg:px-10",
+          chapter ? "pt-24 pb-24 lg:pt-32 lg:pb-32" : "py-24 lg:py-32",
+        )}
+      >
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="animate-on-scroll animate-fade-left lg:col-span-5">
             <p className="eyebrow">— {content.eyebrow}</p>

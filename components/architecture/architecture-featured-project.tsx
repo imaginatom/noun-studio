@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { architecturePageDefaults, type ArchitecturePageContent } from "@/lib/content/architecture"
+import { Parallax, SoftReveal } from "@/components/motion"
 
 type FeaturedProjectContent = ArchitecturePageContent["featuredProject"]
 
@@ -14,21 +15,24 @@ export function ArchitectureFeaturedProject({
   content?: FeaturedProjectContent
 }) {
   return (
-    <section className="bg-muted/40 py-24 lg:py-32">
+    <section data-snap-soft className="bg-muted/40 py-24 lg:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
+        <SoftReveal y={48} fromOpacity={0.35} exitY={32} exitOpacity={0.6} scrub={0.9}>
         <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="animate-on-scroll animate-fade-left relative lg:col-span-6">
             <div
               className="relative aspect-[4/5] overflow-hidden"
               style={{ backgroundColor: sectionBg }}
             >
-              <Image
-                src={content.image.src}
-                alt={content.image.alt}
-                fill
-                className="object-cover grayscale"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
+              <Parallax y={-0.06} scaleFrom={0.05} className="absolute inset-0">
+                <Image
+                  src={content.image.src}
+                  alt={content.image.alt}
+                  fill
+                  className="object-cover grayscale"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </Parallax>
               <div aria-hidden className="pointer-events-none absolute inset-0 z-10">
                 <div
                   className="absolute inset-y-0 left-0 w-[22%]"
@@ -90,6 +94,7 @@ export function ArchitectureFeaturedProject({
             </div>
           </div>
         </div>
+        </SoftReveal>
       </div>
     </section>
   )

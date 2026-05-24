@@ -3,13 +3,21 @@
 import { useEffect, useState } from "react"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
+import { SectionChapterIntro } from "@/components/home/section-transition"
+import { cn } from "@/lib/utils"
 
 type TestimonialsContent = HomePageContent["testimonials"]
 
 export function TestimonialsSection({
   content = homePageDefaults.testimonials,
+  chapter,
+  chapterLabel,
+  chapterQuote,
 }: {
   content?: TestimonialsContent
+  chapter?: string
+  chapterLabel?: string
+  chapterQuote?: string
 }) {
   const [current, setCurrent] = useState(0)
   const testimonials = content.items
@@ -29,8 +37,21 @@ export function TestimonialsSection({
   const active = testimonials[current]
 
   return (
-    <section className="bg-background py-24 lg:py-32">
-      <div className="mx-auto max-w-5xl px-6 lg:px-10">
+    <section id="testimonials-section" className="relative bg-background">
+      {chapter && (
+        <SectionChapterIntro
+          chapter={chapter}
+          label={chapterLabel}
+          quote={chapterQuote}
+          embedded
+        />
+      )}
+      <div
+        className={cn(
+          "mx-auto max-w-5xl px-6 lg:px-10",
+          chapter ? "pb-24 pt-24 lg:pb-32 lg:pt-32" : "py-24 lg:py-32",
+        )}
+      >
         <div className="animate-on-scroll mb-16 flex items-baseline justify-between border-b border-border pb-6">
           <p className="eyebrow">— {content.eyebrow}</p>
           <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">

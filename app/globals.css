@@ -10,7 +10,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 96.1%;
     --foreground: 0 0% 8%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 8%;
@@ -105,6 +105,63 @@ body::after {
   body::after {
     opacity: 0.02;
   }
+}
+
+/* II · Approche / Why us */
+.approche-band {
+  background-color: #f9f8f6;
+}
+
+/* Portfolio — black fill with 80×80 grid lines above the color */
+.portfolio-grid-surface {
+  background-color: hsl(0 0% 0%);
+  background-image:
+    linear-gradient(to right, hsl(0 0% 100% / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(0 0% 100% / 0.07) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+/* ── Services overview — inverted dark surface when the section locks
+   into the viewport (pin start). Overrides the local theme variables
+   so existing `text-foreground` / `border-border` / etc. utilities
+   automatically pick up the dark palette inside this scope. ── */
+.services-section {
+  background-color: hsl(var(--background));
+}
+
+.services-section.is-inverted {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 96%;
+  --muted: 0 0% 9%;
+  --muted-foreground: 0 0% 62%;
+  --border: 0 0% 100%;
+  background-color: hsl(0 0% 0%);
+}
+
+/* While the theme is flipping, force a slow color cross-fade on every
+   descendant so the inversion feels coordinated. The class is removed
+   shortly after, so hover transitions revert to their natural speeds. */
+.services-section.is-transitioning,
+.services-section.is-transitioning *,
+.services-section.is-transitioning *::before,
+.services-section.is-transitioning *::after {
+  transition-property: color, background-color, border-color, fill, stroke !important;
+  transition-duration: 700ms !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* 40×40 grid backdrop — invisible until the section inverts. */
+.services-grid-backdrop {
+  background-image:
+    linear-gradient(to right, hsl(0 0% 100% / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(0 0% 100% / 0.07) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0;
+  transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.services-section.is-inverted .services-grid-backdrop {
+  opacity: 1;
 }
 
 /* Lenis recommended baseline */

@@ -21,6 +21,7 @@ export type HomePageContent = {
   services: {
     eyebrow: string
     title: string
+    ctaLabel: string
     items: Array<{
       title: string
       description: string
@@ -120,6 +121,7 @@ export const homePageDefaults: HomePageContent = {
   services: {
     eyebrow: 'Nos expertises',
     title: 'Un studio multidisciplinaire au service de vos projets',
+    ctaLabel: 'Parlons de votre projet',
     items: [
       {
         title: 'Architecture',

@@ -1,448 +1,77 @@
 "use client"
 
-import { forwardRef, useEffect, useRef, useState, type ReactNode } from "react"
+import { useEffect, useRef, type RefObject } from "react"
 import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
 import { cn } from "@/lib/utils"
 
+gsap.registerPlugin(ScrollTrigger)
+
 type ServicesContent = HomePageContent["services"]
-
-type IntroLayerMotion = {
-  opacity: number
-  translateX: number
-  translateY: number
-}
-
-type IntroMotion = {
-  progress: number
-  eyebrow: IntroLayerMotion
-  title: IntroLayerMotion
-}
-
-type ItemMotion = {
-  opacity: number
-  translateY: number
-  progress: number
-}
 
 const serviceHrefs = ["/architecture", "/contact", "/contact"]
 
-const FOCUS_LINE_RATIO = 0.42
-const FOCUS_RANGE_RATIO = 0.48
-const PARALLAX_OFFSET_PX = 72
-const INTRO_PIN_THRESHOLD = 0.88
-const REVEAL_RIGHT_THRESHOLD = 0.78
+const HOLD_TIME = 1.2
+/** Viewport heights of scroll per service transition while pinned. */
+const TRANSITION_VH = 1.45
+// Opacity for non-active items so neighbours remain visible (peeking above/below)
+// without competing with the centred row for attention.
+const DIM_OPACITY = 0.18
 
-/**
- * Two-speed intro parallax: the eyebrow drifts in slowly from above its position,
- * the title rushes in from well below — initially ~500 px apart on the Y axis,
- * converging to their resting layout when the intro hits the viewport center.
- */
-const EYEBROW_OFFSET = { x: -32, y: -220 } as const
-const TITLE_OFFSET = { x: 24, y: 280 } as const
-const EYEBROW_SPEED = 0.85
-const TITLE_SPEED = 1.55
-
-const hiddenItemMotion: ItemMotion = {
-  progress: 0,
-  opacity: 0,
-  translateY: PARALLAX_OFFSET_PX,
-}
-
-const settledLayer: IntroLayerMotion = { opacity: 1, translateX: 0, translateY: 0 }
-
-const settledIntroMotion: IntroMotion = {
-  progress: 1,
-  eyebrow: settledLayer,
-  title: settledLayer,
-}
-
-const defaultIntroMotion: IntroMotion = {
-  progress: 0,
-  eyebrow: {
-    opacity: 0.18,
-    translateX: EYEBROW_OFFSET.x,
-    translateY: EYEBROW_OFFSET.y,
-  },
-  title: {
-    opacity: 0.18,
-    translateX: TITLE_OFFSET.x,
-    translateY: TITLE_OFFSET.y,
-  },
-}
-
-/** Ease-out quart: starts fast, decelerates into place. */
-function easeOutQuart(t: number): number {
-  const clamped = Math.max(0, Math.min(1, t))
-  return 1 - (1 - clamped) ** 4
-}
-
-function layerFromProgress(
-  scrollProgress: number,
-  offset: { x: number; y: number },
-  speed: number,
-): IntroLayerMotion {
-  const layerProgress = Math.min(1, Math.max(0, scrollProgress) * speed)
-  const eased = easeOutQuart(layerProgress)
-  const remaining = 1 - eased
-
-  return {
-    opacity: 0.18 + eased * 0.82,
-    translateX: remaining * offset.x,
-    translateY: remaining * offset.y,
-  }
-}
-
-function computeIntroMotion(sectionRect: DOMRect, vh: number): IntroMotion {
-  const sectionTop = sectionRect.top
-  // Progress 0 when the section first enters from the bottom of the viewport,
-  // progress 1 when the section's top has risen near the viewport top — which
-  // visually corresponds to the intro block being centered in the viewport
-  // (the intro sits at the top of the section, then becomes sticky).
-  const entryStart = vh * 0.95
-  const entryEnd = vh * 0.12
-
-  let progress = 1
-  if (sectionTop >= entryStart) {
-    progress = 0
-  } else if (sectionTop > entryEnd) {
-    progress = (entryStart - sectionTop) / (entryStart - entryEnd)
-  }
-
-  const clamped = Math.max(0, Math.min(1, progress))
-
-  return {
-    progress: clamped,
-    eyebrow: layerFromProgress(clamped, EYEBROW_OFFSET, EYEBROW_SPEED),
-    title: layerFromProgress(clamped, TITLE_OFFSET, TITLE_SPEED),
-  }
-}
-
-function computeItemMotion(rect: DOMRect, vh: number): ItemMotion {
-  const itemCenter = rect.top + rect.height / 2
-  const focusLine = vh * FOCUS_LINE_RATIO
-  const range = vh * FOCUS_RANGE_RATIO
-  const progress = Math.max(0, Math.min(1, 1 - Math.abs(itemCenter - focusLine) / range))
-
-  return {
-    progress,
-    opacity: 0.28 + progress * 0.72,
-    translateY: (1 - progress) * PARALLAX_OFFSET_PX,
-  }
-}
+// ─── Left intro ────────────────────────────────────────────────────────────────
+// Fades in on entry (GSAP-driven). Static once pinned.
 
 function ServicesStickyIntro({
+  introRef,
   eyebrow,
   title,
-  motion,
-  isPinned,
+  ctaLabel,
 }: {
+  introRef: RefObject<HTMLDivElement | null>
   eyebrow: string
   title: string
-  motion: IntroMotion
-  isPinned: boolean
+  ctaLabel: string
 }) {
   return (
-    <div
-      className={cn(
-        "py-16 lg:h-full lg:w-full lg:py-0",
-        !isPinned && "lg:flex lg:min-h-svh lg:items-center",
-        isPinned &&
-          "lg:sticky lg:top-28 lg:z-10 lg:flex lg:max-h-[calc(100dvh-7rem)] lg:items-center",
-      )}
-    >
-      <div className={cn("max-w-[28rem]", !isPinned && "lg:pointer-events-none")}>
-        <p
-          className="eyebrow flex items-center gap-3"
-          style={{
-            transform: `translate3d(${motion.eyebrow.translateX}px, ${motion.eyebrow.translateY}px, 0)`,
-            opacity: motion.eyebrow.opacity,
-            willChange: "transform, opacity",
-          }}
-        >
+    <div className="lg:py-16">
+      <div ref={introRef} className="max-w-[28rem]">
+        <p className="eyebrow flex items-center gap-3">
           <span className="inline-block h-px w-8 bg-foreground/40" aria-hidden="true" />
           {eyebrow}
         </p>
         <h2
-          className="mt-8 font-serif font-light leading-[0.95] text-foreground text-balance text-[clamp(2.5rem,5.4vw,5.25rem)]"
-          style={{
-            transform: `translate3d(${motion.title.translateX}px, ${motion.title.translateY}px, 0)`,
-            opacity: motion.title.opacity,
-            letterSpacing: "-0.025em",
-            willChange: "transform, opacity",
-          }}
+          className="mt-8 font-serif font-light leading-[0.95] text-foreground text-balance text-[clamp(2rem,4.5vw,4.375rem)]"
+          style={{ letterSpacing: "-0.025em" }}
         >
           {title}
         </h2>
         <div
-          className="mt-10 hidden h-px w-full max-w-[6rem] origin-left scale-x-0 bg-foreground/40 transition-transform duration-[900ms] ease-out lg:block"
-          style={{
-            transform: `scaleX(${Math.min(1, motion.progress * 1.4)})`,
-            willChange: "transform",
-          }}
+          className="mt-10 hidden h-px w-full max-w-[6rem] origin-left bg-foreground/40 lg:block"
           aria-hidden="true"
         />
-        <p
-          className="mt-6 hidden max-w-sm text-[13px] font-light leading-relaxed text-muted-foreground lg:block"
-          style={{
-            opacity: motion.title.opacity * 0.85,
-            transform: `translate3d(0, ${(1 - motion.progress) * 16}px, 0)`,
-            willChange: "transform, opacity",
-          }}
-        >
-          Chaque pratique nourrit l’autre — architecture, design et contenu, pensés
+        <p className="mt-6 hidden max-w-sm text-[13px] font-light leading-relaxed text-muted-foreground lg:block">
+          Chaque pratique nourrit l'autre — architecture, design et contenu, pensés
           comme un seul geste.
         </p>
+        <Link
+          href="/contact"
+          className="group mt-10 inline-flex items-baseline gap-3 border-b border-foreground/30 pb-2 text-sm font-medium tracking-wide text-foreground transition-colors hover:border-foreground lg:mt-12"
+        >
+          {ctaLabel}
+          <ArrowUpRight
+            className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            strokeWidth={1.5}
+          />
+        </Link>
       </div>
     </div>
   )
 }
 
-const ServiceParallaxItem = forwardRef<
-  HTMLLIElement,
-  { children: ReactNode; motion: ItemMotion }
->(function ServiceParallaxItem({ children, motion }, ref) {
-  return (
-    <li
-      ref={ref}
-      className="flex min-h-svh items-center border-b border-border/70 last:border-b-0"
-      style={{
-        opacity: motion.opacity,
-        transform: `translate3d(0, ${motion.translateY}px, 0) scale(${0.985 + motion.progress * 0.015})`,
-        filter: `blur(${(1 - motion.progress) * 1.2}px)`,
-        willChange: "transform, opacity, filter",
-        pointerEvents: motion.opacity < 0.15 ? "none" : undefined,
-      }}
-    >
-      {children}
-    </li>
-  )
-})
-
-export function ServicesOverview({
-  content = homePageDefaults.services,
-}: {
-  content?: ServicesContent
-}) {
-  const sectionRef = useRef<HTMLElement>(null)
-  const firstItemRef = useRef<HTMLLIElement>(null)
-  const hasPinnedRef = useRef(false)
-  const hasRevealedRightRef = useRef(false)
-  const [introMotion, setIntroMotion] = useState<IntroMotion>(defaultIntroMotion)
-  const [isIntroPinned, setIsIntroPinned] = useState(false)
-  const [revealRight, setRevealRight] = useState(false)
-  const [firstItemMotion, setFirstItemMotion] = useState<ItemMotion>(hiddenItemMotion)
-  const frame = useRef<number | null>(null)
-
-  useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reducedMotion) {
-      setIntroMotion(settledIntroMotion)
-      setIsIntroPinned(true)
-      setRevealRight(true)
-      setFirstItemMotion({ progress: 1, opacity: 1, translateY: 0 })
-      hasRevealedRightRef.current = true
-      return
-    }
-
-    const update = () => {
-      if (window.innerWidth < 1024) {
-        hasPinnedRef.current = false
-        hasRevealedRightRef.current = false
-        setIntroMotion(settledIntroMotion)
-        setIsIntroPinned(false)
-        setRevealRight(false)
-        setFirstItemMotion({ progress: 1, opacity: 1, translateY: 0 })
-        frame.current = null
-        return
-      }
-
-      const section = sectionRef.current
-      const firstItem = firstItemRef.current
-      if (!section) {
-        frame.current = null
-        return
-      }
-
-      const vh = window.innerHeight
-      const sectionRect = section.getBoundingClientRect()
-      const intro = computeIntroMotion(sectionRect, vh)
-
-      const sectionInView = sectionRect.bottom > 0 && sectionRect.top < vh
-      if (!sectionInView) {
-        hasPinnedRef.current = false
-        hasRevealedRightRef.current = false
-      } else if (intro.progress >= INTRO_PIN_THRESHOLD) {
-        hasPinnedRef.current = true
-      }
-
-      if (intro.progress >= REVEAL_RIGHT_THRESHOLD || hasPinnedRef.current) {
-        hasRevealedRightRef.current = true
-      }
-
-      const pinned = hasPinnedRef.current
-      const shouldRevealRight = hasRevealedRightRef.current
-
-      setIsIntroPinned(pinned)
-      setRevealRight(shouldRevealRight)
-      setIntroMotion(pinned ? settledIntroMotion : intro)
-
-      if (!shouldRevealRight || !firstItem) {
-        setFirstItemMotion(hiddenItemMotion)
-      } else {
-        setFirstItemMotion(computeItemMotion(firstItem.getBoundingClientRect(), vh))
-      }
-
-      frame.current = null
-    }
-
-    const onScroll = () => {
-      if (frame.current !== null) return
-      frame.current = window.requestAnimationFrame(update)
-    }
-
-    update()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", update)
-    window.__lenis?.on("scroll", onScroll)
-
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", update)
-      window.__lenis?.off("scroll", onScroll)
-      if (frame.current !== null) {
-        window.cancelAnimationFrame(frame.current)
-      }
-    }
-  }, [content.items.length])
-
-  if (content.items.length === 0) {
-    return null
-  }
-
-  const [firstService, ...restServices] = content.items
-
-  return (
-    <section
-      ref={sectionRef}
-      className="relative bg-background"
-      aria-label={content.title}
-    >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/15 to-transparent"
-      />
-      <div className="mx-auto max-w-7xl px-6 lg:px-10">
-        <div className="grid gap-8 lg:grid-cols-12 lg:gap-16 lg:items-stretch">
-          <div className="lg:col-span-4 lg:self-stretch">
-            <ServicesStickyIntro
-              eyebrow={content.eyebrow}
-              title={content.title}
-              motion={introMotion}
-              isPinned={isIntroPinned}
-            />
-          </div>
-
-          <div className="lg:col-span-8">
-            <ul className="border-t border-border/70">
-              <ServiceParallaxItem ref={firstItemRef} motion={firstItemMotion}>
-                <ServiceRow
-                  href={serviceHrefs[0] ?? "/contact"}
-                  index={0}
-                  title={firstService.title}
-                  description={firstService.description}
-                />
-              </ServiceParallaxItem>
-
-              {restServices.map((service, index) => (
-                <ServiceParallaxItemWithScroll
-                  key={service.title}
-                  index={index + 1}
-                  revealRight={revealRight}
-                >
-                  <ServiceRow
-                    href={serviceHrefs[index + 1] ?? "/contact"}
-                    index={index + 1}
-                    title={service.title}
-                    description={service.description}
-                  />
-                </ServiceParallaxItemWithScroll>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function ServiceParallaxItemWithScroll({
-  children,
-  index,
-  revealRight,
-}: {
-  children: ReactNode
-  index: number
-  revealRight: boolean
-}) {
-  const ref = useRef<HTMLLIElement>(null)
-  const [motion, setMotion] = useState<ItemMotion>(hiddenItemMotion)
-  const frame = useRef<number | null>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reducedMotion) {
-      setMotion({ progress: 1, opacity: 1, translateY: 0 })
-      return
-    }
-
-    const update = () => {
-      if (window.innerWidth < 1024) {
-        setMotion({ progress: 1, opacity: 1, translateY: 0 })
-        frame.current = null
-        return
-      }
-
-      if (!revealRight) {
-        setMotion(hiddenItemMotion)
-        frame.current = null
-        return
-      }
-
-      setMotion(computeItemMotion(el.getBoundingClientRect(), window.innerHeight))
-      frame.current = null
-    }
-
-    const onScroll = () => {
-      if (frame.current !== null) return
-      frame.current = window.requestAnimationFrame(update)
-    }
-
-    update()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", update)
-    window.__lenis?.on("scroll", onScroll)
-
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", update)
-      window.__lenis?.off("scroll", onScroll)
-      if (frame.current !== null) {
-        window.cancelAnimationFrame(frame.current)
-      }
-    }
-  }, [index, revealRight])
-
-  return (
-    <ServiceParallaxItem ref={ref} motion={motion}>
-      {children}
-    </ServiceParallaxItem>
-  )
-}
+// ─── Service row ───────────────────────────────────────────────────────────────
 
 function ServiceRow({
   href,
@@ -459,7 +88,7 @@ function ServiceRow({
   return (
     <Link
       href={href}
-      className="group grid w-full grid-cols-12 items-start gap-4 py-12 transition-colors hover:bg-muted/30 lg:gap-6 lg:py-16"
+      className="group grid w-full grid-cols-12 items-start gap-4 py-14 transition-colors hover:bg-muted/20 lg:gap-6 lg:py-20"
     >
       <span
         className="col-span-2 font-serif text-3xl font-light italic leading-none text-muted-foreground/80 transition-colors group-hover:text-foreground md:text-4xl lg:col-span-2 lg:text-5xl"
@@ -493,5 +122,194 @@ function ServiceRow({
         />
       </span>
     </Link>
+  )
+}
+
+// ─── Main component ────────────────────────────────────────────────────────────
+
+export function ServicesOverview({
+  content = homePageDefaults.services,
+}: {
+  content?: ServicesContent
+}) {
+  const sectionRef = useRef<HTMLElement>(null)
+  const pinContainerRef = useRef<HTMLDivElement>(null)
+  const introRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLUListElement>(null)
+  const itemsRef = useRef<(HTMLLIElement | null)[]>([])
+
+  useEffect(() => {
+    const section = sectionRef.current
+    const pinContainer = pinContainerRef.current
+    const introEl = introRef.current
+    const list = listRef.current
+    const items = itemsRef.current.filter(Boolean) as HTMLLIElement[]
+
+    if (!section || !pinContainer || !introEl || !list || items.length < 2) return
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (reducedMotion || window.innerWidth < 1024) return
+
+    // Coordinated theme flip: enable the slow transition rules, toggle the
+    // inverted state, then drop the transition class so hover effects revert
+    // to their natural snappiness once the cross-fade is finished.
+    let flipTimer: number | undefined
+    const setInverted = (inverted: boolean) => {
+      if (typeof window === "undefined") return
+      window.clearTimeout(flipTimer)
+      section.classList.add("is-transitioning")
+      section.classList.toggle("is-inverted", inverted)
+      flipTimer = window.setTimeout(() => {
+        section.classList.remove("is-transitioning")
+      }, 800)
+    }
+
+    const ctx = gsap.context(() => {
+      const n = items.length
+      // The list is flex-centred in its column, so when y=0 the *middle* item
+      // sits at the optical centre. Translating up/down by rowHeight brings
+      // the next/previous item to centre while keeping neighbours in view.
+      const centerIndex = (n - 1) / 2
+      const yFor = (i: number) => (centerIndex - i) * items[0].offsetHeight
+
+      // ── Initial state ──
+      gsap.set(introEl, { opacity: 0, y: 40 })
+      gsap.set(list, { y: yFor(0), opacity: 0 })
+      items.forEach((item, i) => {
+        gsap.set(item, { opacity: i === 0 ? 1 : DIM_OPACITY })
+      })
+
+      // ── Entry: intro + list fade in as the section scrolls into view ──
+      // The same trigger also flips the section to its dark/inverted theme at
+      // the exact moment the pin engages (`onLeave`) and reverses it when the
+      // user scrolls back up past the pin start (`onEnterBack`).
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top 85%",
+            end: "top top",
+            scrub: 1,
+            invalidateOnRefresh: true,
+            onLeave: () => setInverted(true),
+            onEnterBack: () => setInverted(false),
+          },
+        })
+        .to(introEl, { opacity: 1, y: 0, ease: "power2.out", duration: 1 }, 0)
+        .to(list, { opacity: 1, ease: "power2.out", duration: 1 }, 0.15)
+
+      // ── Pin: scroll the list vertically, one row at a time ──
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          pin: pinContainer,
+          start: "top top",
+          end: () => `+=${((n - 1) * TRANSITION_VH + HOLD_TIME) * window.innerHeight}`,
+          scrub: 1,
+          invalidateOnRefresh: true,
+          pinSpacing: true,
+        },
+      })
+
+      for (let i = 0; i < n - 1; i++) {
+        const at = i * TRANSITION_VH
+        tl.to(list, { y: () => yFor(i + 1), ease: "power2.inOut", duration: TRANSITION_VH }, at)
+        tl.to(items[i], { opacity: DIM_OPACITY, ease: "power2.inOut", duration: TRANSITION_VH }, at)
+        tl.to(items[i + 1], { opacity: 1, ease: "power2.inOut", duration: TRANSITION_VH }, at)
+      }
+
+      // Hold: last item stays centred before the pin releases
+      tl.to({}, { duration: HOLD_TIME }, (n - 1) * TRANSITION_VH)
+    }, section)
+
+    return () => {
+      if (typeof window !== "undefined") window.clearTimeout(flipTimer)
+      section.classList.remove("is-inverted", "is-transitioning")
+      ctx.revert()
+    }
+  }, [content.items.length])
+
+  if (content.items.length === 0) return null
+
+  return (
+    <section
+      ref={sectionRef}
+      data-snap-soft
+      className="services-section relative"
+      aria-label={content.title}
+    >
+      {/*
+        pinContainerRef: the element GSAP pins.
+        On desktop: h-screen with flex centering so content sits in the viewport.
+        On mobile/tablet: natural height, normal scroll, no animation.
+      */}
+      <div
+        ref={pinContainerRef}
+        className="relative py-24 lg:flex lg:min-h-screen lg:h-[105svh] lg:flex-col lg:pt-28 lg:pb-0"
+      >
+        {/*
+          Grid backdrop — sits behind the content and inside the pin container
+          so it stays locked to the viewport while pinned. Opacity is driven by
+          the `.services-section.is-inverted` rule in globals.css.
+        */}
+        <div
+          aria-hidden="true"
+          className="services-grid-backdrop pointer-events-none absolute inset-0"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/15 to-transparent"
+        />
+
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-6 lg:flex lg:flex-1 lg:flex-col lg:px-10">
+          <div className="grid gap-8 lg:grid-cols-12 lg:flex-1 lg:items-stretch lg:gap-16">
+
+            {/* Left column — top-aligned relative to the grid */}
+            <div className="lg:col-span-5 lg:self-start lg:pt-0">
+              <ServicesStickyIntro
+                introRef={introRef}
+                eyebrow={content.eyebrow}
+                title={content.title}
+                ctaLabel={content.ctaLabel}
+              />
+            </div>
+
+            {/*
+              Right column — fills the remaining viewport height, vertically
+              centres the list, and clips the overflowing neighbours with a
+              soft mask so they peek in / out instead of being hard-cut.
+            */}
+            <div
+              className={cn(
+                "lg:col-span-7 lg:relative lg:flex lg:flex-col lg:justify-center lg:overflow-hidden",
+                "lg:[mask-image:linear-gradient(to_bottom,transparent_0%,black_14%,black_86%,transparent_100%)]",
+                "lg:[-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_14%,black_86%,transparent_100%)]",
+              )}
+            >
+              <ul
+                ref={listRef}
+                className="relative w-full border-t border-border/40 lg:border-t-0 lg:will-change-transform"
+              >
+                {content.items.map((service, index) => (
+                  <li
+                    key={service.title}
+                    ref={(el) => { itemsRef.current[index] = el }}
+                    className="border-b border-border/40 last:border-b-0 lg:min-h-[38svh] lg:flex lg:items-center"
+                  >
+                    <ServiceRow
+                      href={serviceHrefs[index] ?? "/contact"}
+                      index={index}
+                      title={service.title}
+                      description={service.description}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }

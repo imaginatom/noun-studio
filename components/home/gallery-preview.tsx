@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
+import { SectionChapterIntro } from "@/components/home/section-transition"
 
 type GalleryContent = HomePageContent["galleryPreview"]
 
@@ -223,9 +224,15 @@ function GalleryStickyIntro({ content }: { content: GalleryContent }) {
 export function GalleryPreview({
   content = homePageDefaults.galleryPreview,
   images = [],
+  chapter,
+  chapterLabel,
+  chapterQuote,
 }: {
   content?: GalleryContent
   images?: Array<{ src: string; alt: string; label: string }>
+  chapter?: string
+  chapterLabel?: string
+  chapterQuote?: string
 }) {
   if (images.length === 0) {
     return null
@@ -235,19 +242,20 @@ export function GalleryPreview({
 
   return (
     <section
-      className="relative overflow-hidden bg-black text-background"
+      data-snap-soft
+      className="portfolio-grid-surface relative overflow-hidden text-background"
       aria-label={content.title}
     >
-      {/* Atmospheric grid */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.05]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,1) 1px, transparent 1px)",
-          backgroundSize: "120px 120px",
-        }}
-      />
+      {chapter && (
+        <SectionChapterIntro
+          chapter={chapter}
+          label={chapterLabel}
+          quote={chapterQuote}
+          isDark
+          embedded
+          className="relative z-[1]"
+        />
+      )}
       {/* Top & bottom edge fades for cinematic blending */}
       <div
         aria-hidden="true"
@@ -263,7 +271,12 @@ export function GalleryPreview({
         }}
       />
 
-      <div className="relative mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
+      <div
+        className={cn(
+          "relative mx-auto max-w-7xl px-6 lg:px-10",
+          chapter ? "pt-16 pb-24 lg:pt-20 lg:pb-32" : "py-24 lg:py-32",
+        )}
+      >
         <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-4">
             <GalleryStickyIntro content={content} />
