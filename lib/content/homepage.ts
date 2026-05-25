@@ -25,6 +25,11 @@ export type HomePageContent = {
     items: Array<{
       title: string
       description: string
+      image?: {
+        src: string
+        alt: string
+        path?: string | null
+      }
     }>
   }
   whyUs: {

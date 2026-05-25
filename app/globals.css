@@ -164,6 +164,24 @@ body::after {
   opacity: 1;
 }
 
+/* Stack of per-service background images. Each child's opacity is driven by
+   GSAP so only the active service's image is visible; this wrapper acts as a
+   visibility gate so the images never bleed onto the light section.
+
+   The 700ms delay applies *only* when entering the inverted state, so the
+   first image fades in **after** the section's dark cross-fade has finished.
+   On reverse, the base rule (no delay) applies, so the stack fades out
+   together with the section returning to light. */
+.services-bg-stack {
+  opacity: 0;
+  transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.services-section.is-inverted .services-bg-stack {
+  opacity: 1;
+  transition-delay: 700ms;
+}
+
 /* Lenis recommended baseline */
 html.lenis,
 html.lenis body {

@@ -20,6 +20,17 @@ const TRANSITION_VH = 1.45
 // Opacity for non-active items so neighbours remain visible (peeking above/below)
 // without competing with the centred row for attention.
 const DIM_OPACITY = 0.18
+// Peak opacity for the centred service's background image. Kept low so the
+// text stays the focal point and the image reads as atmosphere.
+const BG_IMAGE_OPACITY = 0.22
+// Per-service parallax: each image translates upward across the entire pin
+// duration by `BASE + STEP * index` px (total range), so every layer drifts
+// at a slightly different speed for a sense of depth.
+const PARALLAX_BASE_PX = 160
+const PARALLAX_STEP_PX = 80
+// Vertical headroom added to each bg image so translation never reveals
+// empty edges. Should be >= max(|y|) used by the parallax tweens.
+const PARALLAX_HEADROOM_PX = 220
 
 // ─── Left intro ────────────────────────────────────────────────────────────────
 // Fades in on entry (GSAP-driven). Static once pinned.
@@ -137,6 +148,7 @@ export function ServicesOverview({
   const introRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
   const itemsRef = useRef<(HTMLLIElement | null)[]>([])
+  const bgImagesRef = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
     const section = sectionRef.current
@@ -144,6 +156,7 @@ export function ServicesOverview({
     const introEl = introRef.current
     const list = listRef.current
     const items = itemsRef.current.filter(Boolean) as HTMLLIElement[]
+    const bgImages = bgImagesRef.current.filter(Boolean) as HTMLDivElement[]
 
     if (!section || !pinContainer || !introEl || !list || items.length < 2) return
 
@@ -178,6 +191,18 @@ export function ServicesOverview({
       items.forEach((item, i) => {
         gsap.set(item, { opacity: i === 0 ? 1 : DIM_OPACITY })
       })
+      // First service's background image starts visible at its peak opacity
+      // (the wrapper itself is gated by the `.is-inverted` CSS rule so nothing
+      // shows until the section locks into the dark surface). Each image is
+      // pre-translated *downward* by half its parallax range so the pin
+      // timeline can sweep it upward through the whole range.
+      bgImages.forEach((img, i) => {
+        const range = PARALLAX_BASE_PX + PARALLAX_STEP_PX * i
+        gsap.set(img, {
+          opacity: i === 0 ? BG_IMAGE_OPACITY : 0,
+          y: range / 2,
+        })
+      })
 
       // ── Entry: intro + list fade in as the section scrolls into view ──
       // The same trigger also flips the section to its dark/inverted theme at
@@ -199,16 +224,27 @@ export function ServicesOverview({
         .to(list, { opacity: 1, ease: "power2.out", duration: 1 }, 0.15)
 
       // ── Pin: scroll the list vertically, one row at a time ──
+      const pinDuration = (n - 1) * TRANSITION_VH + HOLD_TIME
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
           pin: pinContainer,
           start: "top top",
-          end: () => `+=${((n - 1) * TRANSITION_VH + HOLD_TIME) * window.innerHeight}`,
+          end: () => `+=${pinDuration * window.innerHeight}`,
           scrub: 1,
           invalidateOnRefresh: true,
           pinSpacing: true,
         },
+      })
+
+      // Continuous parallax: every bg image sweeps upward across the whole pin,
+      // each at a different range so layers feel like they live at different
+      // depths. Runs in parallel to the cross-fade tweens below (different
+      // property → no conflict).
+      bgImages.forEach((img, i) => {
+        const range = PARALLAX_BASE_PX + PARALLAX_STEP_PX * i
+        tl.to(img, { y: -range / 2, ease: "none", duration: pinDuration }, 0)
       })
 
       for (let i = 0; i < n - 1; i++) {
@@ -216,6 +252,13 @@ export function ServicesOverview({
         tl.to(list, { y: () => yFor(i + 1), ease: "power2.inOut", duration: TRANSITION_VH }, at)
         tl.to(items[i], { opacity: DIM_OPACITY, ease: "power2.inOut", duration: TRANSITION_VH }, at)
         tl.to(items[i + 1], { opacity: 1, ease: "power2.inOut", duration: TRANSITION_VH }, at)
+        // Cross-fade the background images on the same beat as the items.
+        if (bgImages[i]) {
+          tl.to(bgImages[i], { opacity: 0, ease: "power2.inOut", duration: TRANSITION_VH }, at)
+        }
+        if (bgImages[i + 1]) {
+          tl.to(bgImages[i + 1], { opacity: BG_IMAGE_OPACITY, ease: "power2.inOut", duration: TRANSITION_VH }, at)
+        }
       }
 
       // Hold: last item stays centred before the pin releases
@@ -248,9 +291,36 @@ export function ServicesOverview({
         className="relative py-24 lg:flex lg:min-h-screen lg:h-[105svh] lg:flex-col lg:pt-28 lg:pb-0"
       >
         {/*
-          Grid backdrop — sits behind the content and inside the pin container
-          so it stays locked to the viewport while pinned. Opacity is driven by
-          the `.services-section.is-inverted` rule in globals.css.
+          Per-service background image stack — sits at the very back of the pin
+          container. The wrapper's visibility is gated by the `.is-inverted`
+          rule so the images only appear once the section locks into the dark
+          surface; individual child opacities are driven by GSAP so only the
+          centred service's image is visible at a time.
+        */}
+        <div
+          aria-hidden="true"
+          className="services-bg-stack pointer-events-none absolute inset-0 overflow-hidden"
+        >
+          {content.items.map((service, index) => (
+            <div
+              key={`bg-${service.title}-${index}`}
+              ref={(el) => { bgImagesRef.current[index] = el }}
+              className="absolute bg-cover bg-center bg-no-repeat lg:will-change-transform"
+              style={{
+                // Extend past the wrapper on the Y axis so vertical parallax
+                // never exposes an empty band at the top or bottom.
+                top: `-${PARALLAX_HEADROOM_PX}px`,
+                bottom: `-${PARALLAX_HEADROOM_PX}px`,
+                left: 0,
+                right: 0,
+                backgroundImage: service.image?.src ? `url(${service.image.src})` : undefined,
+              }}
+            />
+          ))}
+        </div>
+        {/*
+          Grid backdrop — sits above the bg images so the gridlines read on
+          top of the artwork. Opacity is driven by the `.is-inverted` rule.
         */}
         <div
           aria-hidden="true"

@@ -55,6 +55,7 @@ const emptyStat = (): HomePageContent["socialProof"]["stats"][number] => ({
 const emptyService = (): HomePageContent["services"]["items"][number] => ({
   title: "",
   description: "",
+  image: { src: "", alt: "", path: null },
 })
 
 const emptyBenefit = (): HomePageContent["whyUs"]["benefits"][number] => ({
@@ -533,6 +534,44 @@ export default function AdminHomepageEditor() {
                             items: updateListItem(prev.items, index, {
                               ...service,
                               description: event.target.value,
+                            }),
+                          }))
+                        }
+                      />
+                    </div>
+                    <ImageUpload
+                      label="Background image"
+                      helperText="Drag & drop or upload. Displays as a low-opacity background while this service is centred on the homepage."
+                      value={service.image ?? { src: "", path: null }}
+                      onChange={(value) =>
+                        updateSection("services", (prev) => ({
+                          ...prev,
+                          items: updateListItem(prev.items, index, {
+                            ...service,
+                            image: {
+                              alt: service.image?.alt ?? "",
+                              src: value.src,
+                              path: value.path ?? null,
+                            },
+                          }),
+                        }))
+                      }
+                    />
+                    <div className="space-y-2">
+                      <Label htmlFor={`service-image-alt-${index}`}>Image alt text</Label>
+                      <Input
+                        id={`service-image-alt-${index}`}
+                        value={service.image?.alt ?? ""}
+                        onChange={(event) =>
+                          updateSection("services", (prev) => ({
+                            ...prev,
+                            items: updateListItem(prev.items, index, {
+                              ...service,
+                              image: {
+                                src: service.image?.src ?? "",
+                                path: service.image?.path ?? null,
+                                alt: event.target.value,
+                              },
                             }),
                           }))
                         }
