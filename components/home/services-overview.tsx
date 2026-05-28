@@ -10,13 +10,20 @@ import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(ScrollTrigger)
 
+declare global {
+  interface Window {
+    __servicesExitSnap?: boolean
+  }
+}
+
 type ServicesContent = HomePageContent["services"]
 
 const serviceHrefs = ["/architecture", "/contact", "/contact"]
 
-const HOLD_TIME = 1.2
 /** Viewport heights of scroll per service transition while pinned. */
 const TRANSITION_VH = 1.45
+/** Matches `.services-section.is-transitioning` duration in globals.css */
+const THEME_FLIP_MS = 700
 // Opacity for non-active items so neighbours remain visible (peeking above/below)
 // without competing with the centred row for attention.
 const DIM_OPACITY = 0.18
@@ -167,6 +174,7 @@ export function ServicesOverview({
     // inverted state, then drop the transition class so hover effects revert
     // to their natural snappiness once the cross-fade is finished.
     let flipTimer: number | undefined
+    let exitScrollTimer: number | undefined
     const setInverted = (inverted: boolean) => {
       if (typeof window === "undefined") return
       window.clearTimeout(flipTimer)
@@ -174,7 +182,7 @@ export function ServicesOverview({
       section.classList.toggle("is-inverted", inverted)
       flipTimer = window.setTimeout(() => {
         section.classList.remove("is-transitioning")
-      }, 800)
+      }, THEME_FLIP_MS + 80)
     }
 
     const ctx = gsap.context(() => {
@@ -213,7 +221,7 @@ export function ServicesOverview({
           scrollTrigger: {
             trigger: section,
             start: "top 85%",
-            end: "top top",
+            end: "-10% top",
             scrub: 1,
             invalidateOnRefresh: true,
             onLeave: () => setInverted(true),
@@ -224,7 +232,63 @@ export function ServicesOverview({
         .to(list, { opacity: 1, ease: "power2.out", duration: 1 }, 0.15)
 
       // ── Pin: scroll the list vertically, one row at a time ──
-      const pinDuration = (n - 1) * TRANSITION_VH + HOLD_TIME
+      const pinDuration = (n - 1) * TRANSITION_VH
+      let exitSnapActive = false
+
+      const performApprocheScroll = () => {
+        const approche = section.nextElementSibling
+        if (!approche || !(approche instanceof HTMLElement)) {
+          exitSnapActive = false
+          window.__servicesExitSnap = false
+          return
+        }
+
+        const lenis = window.__lenis
+        const targetY = approche.getBoundingClientRect().top + window.scrollY
+        const currentY = lenis?.scroll ?? window.scrollY
+        const distance = Math.max(0, targetY - currentY)
+
+        const finish = () => {
+          exitSnapActive = false
+          window.__servicesExitSnap = false
+          ScrollTrigger.refresh()
+        }
+
+        if (distance < 6) {
+          finish()
+          return
+        }
+
+        const duration = Math.min(1.05, Math.max(0.7, distance / window.innerHeight + 0.4))
+        const easeInOutQuad = (t: number) =>
+          t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
+
+        if (lenis) {
+          lenis.scrollTo(targetY, {
+            duration,
+            lock: true,
+            force: true,
+            programmatic: true,
+            easing: easeInOutQuad,
+            onComplete: finish,
+          })
+        } else {
+          window.scrollTo({ top: targetY, behavior: "smooth" })
+          window.setTimeout(finish, duration * 1000)
+        }
+      }
+
+      const exitToApproche = () => {
+        if (exitSnapActive) return
+
+        exitSnapActive = true
+        window.__servicesExitSnap = true
+
+        // Mirror entry: cross-fade back to the light surface, then continue to Approche.
+        setInverted(false)
+        window.clearTimeout(exitScrollTimer)
+        exitScrollTimer = window.setTimeout(performApprocheScroll, THEME_FLIP_MS)
+      }
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -235,6 +299,20 @@ export function ServicesOverview({
           scrub: 1,
           invalidateOnRefresh: true,
           pinSpacing: true,
+          onLeave: (self) => {
+            if (self.direction !== 1) return
+            exitToApproche()
+          },
+          onLeaveBack: () => {
+            if (exitSnapActive) return
+            window.clearTimeout(exitScrollTimer)
+            setInverted(true)
+          },
+          onEnterBack: () => {
+            if (exitSnapActive) return
+            window.clearTimeout(exitScrollTimer)
+            setInverted(true)
+          },
         },
       })
 
@@ -244,7 +322,7 @@ export function ServicesOverview({
       // property → no conflict).
       bgImages.forEach((img, i) => {
         const range = PARALLAX_BASE_PX + PARALLAX_STEP_PX * i
-        tl.to(img, { y: -range / 2, ease: "none", duration: pinDuration }, 0)
+        tl.to(img, { y: -range / 2, ease: "easeInOut", duration: pinDuration }, 0)
       })
 
       for (let i = 0; i < n - 1; i++) {
@@ -260,13 +338,13 @@ export function ServicesOverview({
           tl.to(bgImages[i + 1], { opacity: BG_IMAGE_OPACITY, ease: "power2.inOut", duration: TRANSITION_VH }, at)
         }
       }
-
-      // Hold: last item stays centred before the pin releases
-      tl.to({}, { duration: HOLD_TIME }, (n - 1) * TRANSITION_VH)
     }, section)
 
     return () => {
-      if (typeof window !== "undefined") window.clearTimeout(flipTimer)
+      if (typeof window !== "undefined") {
+        window.clearTimeout(flipTimer)
+        window.clearTimeout(exitScrollTimer)
+      }
       section.classList.remove("is-inverted", "is-transitioning")
       ctx.revert()
     }
@@ -305,7 +383,7 @@ export function ServicesOverview({
             <div
               key={`bg-${service.title}-${index}`}
               ref={(el) => { bgImagesRef.current[index] = el }}
-              className="absolute bg-cover bg-center bg-no-repeat lg:will-change-transform"
+              className="services-bg-image absolute bg-cover bg-center bg-no-repeat lg:will-change-transform"
               style={{
                 // Extend past the wrapper on the Y axis so vertical parallax
                 // never exposes an empty band at the top or bottom.

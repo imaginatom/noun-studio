@@ -7,6 +7,7 @@ import { ArrowUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
 import { SectionChapterIntro } from "@/components/home/section-transition"
+import { ModularGridOverlay } from "@/components/ModularGridBackground"
 
 type GalleryContent = HomePageContent["galleryPreview"]
 
@@ -243,9 +244,12 @@ export function GalleryPreview({
   return (
     <section
       data-snap-soft
-      className="portfolio-grid-surface relative overflow-hidden text-background"
+      className="gallery-preview-surface relative isolate overflow-hidden text-background"
       aria-label={content.title}
     >
+      <ModularGridOverlay logoRatio={0.05} />
+
+      <div className="relative z-[1]">
       {chapter && (
         <SectionChapterIntro
           chapter={chapter}
@@ -253,23 +257,9 @@ export function GalleryPreview({
           quote={chapterQuote}
           isDark
           embedded
-          className="relative z-[1]"
+          className="relative"
         />
       )}
-      {/* Top & bottom edge fades for cinematic blending */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black via-black/60 to-transparent"
-      />
-      {/* Seamless blend into the next light section */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-40"
-        style={{
-          background:
-            "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 40%, hsl(var(--background)) 100%)",
-        }}
-      />
 
       <div
         className={cn(
@@ -301,6 +291,7 @@ export function GalleryPreview({
             </div>
           </div>
         </div>
+      </div>
       </div>
     </section>
   )

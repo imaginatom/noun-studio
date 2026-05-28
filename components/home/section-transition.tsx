@@ -14,6 +14,8 @@ export type SectionChapterIntroProps = {
   align?: "center" | "left"
   /** Adds spacing before the section body when nested inside a parent section */
   embedded?: boolean
+  /** Show chapter content immediately (no scroll reveal) — use for bottom-of-page embedded intros */
+  revealOnMount?: boolean
   className?: string
 }
 
@@ -126,6 +128,7 @@ export function SectionChapterIntro({
   isDark = false,
   align,
   embedded = false,
+  revealOnMount = false,
   className,
 }: SectionChapterIntroProps) {
   const hasSplitMedia = Boolean(videoSrc && quote)
@@ -140,7 +143,7 @@ export function SectionChapterIntro({
         className,
       )}
     >
-      {isDark && (
+      {isDark && !embedded && (
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background to-black"
@@ -150,7 +153,12 @@ export function SectionChapterIntro({
       {hasSplitMedia ? (
         <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
           <div className="grid items-center gap-10 lg:grid-cols-[2fr_3fr] lg:gap-14 xl:gap-20">
-            <div className="animate-on-scroll animate-fade-left flex flex-col text-left">
+            <div
+              className={cn(
+                "animate-on-scroll animate-fade-left flex flex-col text-left",
+                revealOnMount && "is-visible",
+              )}
+            >
               <ChapterHeader
                 chapter={chapter}
                 label={label}
@@ -167,7 +175,12 @@ export function SectionChapterIntro({
               </p>
             </div>
 
-            <div className="animate-on-scroll animate-fade-right w-full">
+            <div
+              className={cn(
+                "animate-on-scroll animate-fade-right w-full",
+                revealOnMount && "is-visible",
+              )}
+            >
               <ExpertiseVideo src={videoSrc!} />
             </div>
           </div>
@@ -176,6 +189,7 @@ export function SectionChapterIntro({
         <div
           className={cn(
             "animate-on-scroll animate-fade relative mx-auto flex max-w-5xl flex-col px-6 lg:px-10",
+            revealOnMount && "is-visible",
             resolvedAlign === "center" ? "items-center text-center" : "items-start text-left",
           )}
         >

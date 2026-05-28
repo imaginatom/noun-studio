@@ -1,0 +1,36 @@
+<svg width="1920" height="1280" viewBox="0 0 1920 1280" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_9_10)">
+<rect width="1920" height="1280" fill="black"/>
+<rect x="-1" y="-1" width="1922" height="1282" fill="black"/>
+<rect x="-1" y="-1" width="1922" height="1282" stroke="white" stroke-width="2"/>
+<rect x="400" y="291" width="110" height="691" fill="#D9D9D9" fill-opacity="0.25"/>
+<rect x="610" y="291" width="110" height="691" fill="#D9D9D9" fill-opacity="0.25"/>
+<rect x="510" y="291" width="100" height="50" fill="#D9D9D9" fill-opacity="0.25"/>
+<rect x="1199" y="291" width="110" height="691" fill="#D9D9D9" fill-opacity="0.25"/>
+<rect x="1409" y="291" width="110" height="691" fill="#D9D9D9" fill-opacity="0.25"/>
+<rect x="1309" y="291" width="100" height="50" fill="#D9D9D9" fill-opacity="0.25"/>
+<rect x="800" y="291" width="110" height="691" fill="#D9D9D9" fill-opacity="0.25"/>
+<rect x="1010" y="291" width="110" height="691" fill="#D9D9D9" fill-opacity="0.25"/>
+<rect x="910" y="932" width="100" height="50" fill="#D9D9D9" fill-opacity="0.25"/>
+<rect x="918" y="193.426" width="60" height="60" transform="rotate(-45 918 193.426)" fill="#D9D9D9" fill-opacity="0.25"/>
+<line opacity="0.6" x1="1524.5" y1="1090" x2="1524.5" y2="190" stroke="white"/>
+<line opacity="0.6" x1="1193.5" y1="1108" x2="1193.5" y2="208" stroke="white"/>
+<line opacity="0.6" x1="1092.5" y1="1090" x2="1092.5" y2="190" stroke="white"/>
+<line opacity="0.6" x1="393.5" y1="1090" x2="393.5" y2="190" stroke="white"/>
+<line opacity="0.6" x1="1256.5" y1="1090" x2="1256.5" y2="190" stroke="white"/>
+<line opacity="0.6" x1="1580" y1="988.5" x2="340" y2="988.5" stroke="white"/>
+<line opacity="0.6" x1="1580" y1="284.5" x2="340" y2="284.5" stroke="white"/>
+<line opacity="0.6" x1="1580" y1="717.5" x2="340" y2="717.5" stroke="white"/>
+<line opacity="0.6" x1="1580" y1="818.5" x2="340" y2="818.5" stroke="white"/>
+<path d="M400 982C420.5 601.5 793.5 290 1092 290C1390.5 290 1521.99 513.062 1519 717C1516.01 920.938 1353 982 1256 982C1159 982 1092 880.5 1092 818C1092 755.5 1138.76 712.294 1193.5 717C1248.24 721.706 1256 753.5 1256 778.5C1256 803.5 1233.5 818 1215.5 818C1197.5 818 1193.5 804 1193.5 795.5" stroke="white"/>
+<path opacity="0.6" d="M949 252L1019 182" stroke="white"/>
+<path opacity="0.6" d="M903 204L973 134" stroke="white"/>
+<path opacity="0.6" d="M970 250L900 180" stroke="white"/>
+<path opacity="0.6" d="M1018 204L948 134" stroke="white"/>
+</g>
+<defs>
+<clipPath id="clip0_9_10">
+<rect width="1920" height="1280" fill="white"/>
+</clipPath>
+</defs>
+</svg>

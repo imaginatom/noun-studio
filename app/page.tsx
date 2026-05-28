@@ -40,7 +40,7 @@ export default async function HomePage() {
       <ScrollProgress />
 
       <HeroSection content={content.hero} />
-      <SocialProofBar content={content.socialProof} />
+      <SocialProofBar  />
 
       <SectionTransition
         chapter="I"

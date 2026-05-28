@@ -19,7 +19,7 @@ export function WhyUsSection({
   chapterLabel?: string
 }) {
   return (
-    <section className="approche-band relative">
+    <section id="approche" data-snap-soft className="approche-band relative">
       {chapter && (
         <SectionChapterIntro
           chapter={chapter}

@@ -1,15 +1,14 @@
 import type { Metadata } from "next"
 import { RealisationsGallery } from "@/components/realisations-gallery"
 import Link from "next/link"
-import { ArrowRight, Mail, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ArrowUpRight, ChevronRight, Mail } from "lucide-react"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { mergePortfolioContent } from "@/lib/content/portfolio"
 
 export const metadata: Metadata = {
   title: "Portfolio — Projets d'Architecture",
   description:
-    "D\u00e9couvrez le portfolio de Noun Studio : projets d'architecture r\u00e9sidentielle et commerciale, identit\u00e9s visuelles et design int\u00e9rieur en Alg\u00e9rie et en France.",
+    "D'ecouvrez le portfolio de Noun Studio : projets d'architecture résidentielle et commerciale, identités visuelles et design intérieur en Algérie et en France.",
 }
 
 export default async function RealisationsPage() {
@@ -23,47 +22,65 @@ export default async function RealisationsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-card pt-32 pb-14 lg:pt-40 lg:pb-16">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <nav aria-label="Fil d'Ariane" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
+      <section className="bg-background pt-28 pb-16 lg:pt-36 lg:pb-20">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <nav aria-label="Fil d'Ariane" className="mb-8 flex items-center gap-1.5 text-xs text-muted-foreground">
             <Link href="/" className="transition-colors hover:text-foreground">
               {content.hero.breadcrumbHomeLabel}
             </Link>
             <ChevronRight className="h-3 w-3" />
             <span className="text-foreground">{content.hero.breadcrumbCurrentLabel}</span>
           </nav>
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-medium uppercase tracking-widest text-accent">{content.hero.eyebrow}</p>
-            <h1 className="mt-2 font-serif text-4xl font-bold text-foreground md:text-5xl text-balance">
+          <div className="mx-auto max-w-4xl">
+            <p className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.28em] text-muted-foreground">
+              <span className="inline-block h-px w-8 bg-foreground/35" aria-hidden="true" />
+              {content.hero.eyebrow}
+            </p>
+            <h1
+              className="mt-8 max-w-3xl font-serif text-[clamp(2.4rem,6.6vw,5.5rem)] font-light leading-[0.93] text-foreground text-balance"
+              style={{ letterSpacing: "-0.025em" }}
+            >
               {content.hero.title}
             </h1>
-            <p className="mt-4 text-lg text-muted-foreground">{content.hero.subtitle}</p>
+            <p className="mt-7 max-w-2xl text-sm font-light leading-[1.75] text-muted-foreground lg:text-base">
+              {content.hero.subtitle}
+            </p>
           </div>
         </div>
       </section>
 
       <RealisationsGallery categories={content.gallery.categories} projects={content.gallery.projects} />
 
-      {/* CTA */}
-      <section className="bg-primary py-16">
-        <div className="mx-auto max-w-3xl px-4 text-center lg:px-8">
-          <h2 className="font-serif text-3xl font-bold text-primary-foreground md:text-4xl text-balance">
+      {/* CTA — light section, separate from the projects grid */}
+      <section className="border-t border-border bg-background py-20 lg:py-28">
+        <div className="mx-auto max-w-4xl px-6 text-center lg:px-10">
+          <h2
+            className="font-serif text-[clamp(2rem,5vw,4rem)] font-light leading-[0.95] text-foreground text-balance"
+            style={{ letterSpacing: "-0.02em" }}
+          >
             {content.cta.title}
           </h2>
-          <p className="mt-3 text-primary-foreground/80">{content.cta.subtitle}</p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg" className="bg-background text-foreground hover:bg-background/90">
-              <Link href={content.cta.primaryCtaHref}>
-                {content.cta.primaryCtaLabel}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
-              <a href={`mailto:${content.cta.emailAddress}`}>
-                <Mail className="mr-2 h-4 w-4" />
-                {content.cta.emailLabel}
-              </a>
-            </Button>
+          <p className="mx-auto mt-5 max-w-2xl text-sm font-light leading-[1.75] text-muted-foreground lg:text-base">
+            {content.cta.subtitle}
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
+            <Link
+              href={content.cta.primaryCtaHref}
+              className="group inline-flex items-baseline gap-3 border-b border-foreground/30 pb-2 text-sm font-medium tracking-[0.12em] text-foreground transition-colors hover:border-foreground"
+            >
+              {content.cta.primaryCtaLabel}
+              <ArrowUpRight
+                className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                strokeWidth={1.5}
+              />
+            </Link>
+            <a
+              href={`mailto:${content.cta.emailAddress}`}
+              className="group inline-flex items-center gap-3 border-b border-foreground/30 pb-2 text-sm font-medium tracking-[0.12em] text-foreground/85 transition-colors hover:border-foreground hover:text-foreground"
+            >
+              <Mail className="h-4 w-4" />
+              {content.cta.emailLabel}
+            </a>
           </div>
         </div>
       </section>

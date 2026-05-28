@@ -2,6 +2,12 @@
 
 import { useEffect } from "react"
 
+declare global {
+  interface Window {
+    __servicesExitSnap?: boolean
+  }
+}
+
 type MagneticScrollProps = {
   /**
    * CSS selector for opt-in magnet anchor elements. Each matching element
@@ -140,6 +146,7 @@ export function MagneticScroll({
     const maybeSettle = () => {
       idleTimer = null
       if (cancelled) return
+      if (window.__servicesExitSnap) return
       if (Math.abs(velocity) > velocityThreshold) return
 
       const targets = Array.from(document.querySelectorAll<HTMLElement>(selector))

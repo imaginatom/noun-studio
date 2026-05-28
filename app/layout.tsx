@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { FloatingCTA } from "@/components/floating-cta"
 import { BackToTop } from "@/components/back-to-top"
 import { ScrollAnimations } from "@/components/scroll-animations"
+import { SitePreloader } from "@/components/site-preloader"
 import { SmoothScroll } from "@/components/smooth-scroll"
 import { MagneticScroll } from "@/components/motion"
 import "./globals.css"
@@ -123,6 +124,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
+        <SitePreloader />
         <SmoothScroll />
         <MagneticScroll />
         <SiteHeader />

@@ -1,6 +1,7 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
+import { cn } from "@/lib/utils"
 
 type ExpertiseVideoProps = {
   src: string
@@ -9,7 +10,7 @@ type ExpertiseVideoProps = {
 export function ExpertiseVideo({ src }: ExpertiseVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const hasTriggeredRef = useRef(false)
+  const [isInView, setIsInView] = useState(false)
 
   useEffect(() => {
     const container = containerRef.current
@@ -18,11 +19,17 @@ export function ExpertiseVideo({ src }: ExpertiseVideoProps) {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry?.isIntersecting || hasTriggeredRef.current) return
+        if (!entry) return
 
-        hasTriggeredRef.current = true
-        void video.play().catch(() => {})
-        observer.disconnect()
+        if (entry.isIntersecting) {
+          setIsInView(true)
+          video.currentTime = 0
+          void video.play().catch(() => {})
+        } else {
+          setIsInView(false)
+          video.pause()
+          video.currentTime = 0
+        }
       },
       { threshold: 0.2 },
     )
@@ -34,7 +41,10 @@ export function ExpertiseVideo({ src }: ExpertiseVideoProps) {
   return (
     <div
       ref={containerRef}
-      className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/10] lg:aspect-[5/4]"
+      className={cn(
+        "relative aspect-[4/3] w-full overflow-hidden transition-opacity duration-500 sm:aspect-[16/10] lg:aspect-[5/4]",
+        isInView ? "opacity-100" : "opacity-0",
+      )}
     >
       <video
         ref={videoRef}

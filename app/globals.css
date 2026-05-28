@@ -55,6 +55,10 @@
     font-feature-settings: "ss01", "cv11";
   }
 
+  html.preloader-active body {
+    overflow: hidden;
+  }
+
   ::selection {
     background-color: hsl(var(--foreground));
     color: hsl(var(--background));
@@ -115,10 +119,25 @@ body::after {
 /* Portfolio — black fill with 80×80 grid lines above the color */
 .portfolio-grid-surface {
   background-color: hsl(0 0% 0%);
-  background-image:
+  /* background-image:
     linear-gradient(to right, hsl(0 0% 100% / 0.07) 1px, transparent 1px),
     linear-gradient(to bottom, hsl(0 0% 100% / 0.07) 1px, transparent 1px);
-  background-size: 80px 80px;
+  background-size: 80px 80px; */
+}
+
+/* Homepage gallery preview — three-stop fade at the bottom edge only */
+.gallery-preview-surface {
+  background-color: #000000;
+  background-image: linear-gradient(
+    180deg,
+    #000000 0%,
+    #7b7b7b 50%,
+    #f4f4f4 74%,
+    #f4f4f4 100%
+  );
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  background-size: 100% 12rem;
 }
 
 /* ── Services overview — inverted dark surface when the section locks
@@ -145,9 +164,19 @@ body::after {
 .services-section.is-transitioning *,
 .services-section.is-transitioning *::before,
 .services-section.is-transitioning *::after {
-  transition-property: color, background-color, border-color, fill, stroke !important;
+  transition-property: color, background-color, border-color, fill, stroke, opacity !important;
   transition-duration: 700ms !important;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.services-section.is-transitioning {
+  transition-property: background-color !important;
+}
+
+.services-section.is-transitioning:not(.is-inverted) .services-grid-backdrop,
+.services-section.is-transitioning:not(.is-inverted) .services-bg-stack {
+  transition-property: opacity !important;
+  transition-delay: 0ms !important;
 }
 
 /* 40×40 grid backdrop — invisible until the section inverts. */
@@ -180,6 +209,51 @@ body::after {
 .services-section.is-inverted .services-bg-stack {
   opacity: 1;
   transition-delay: 700ms;
+}
+
+/* Circular vignette — smaller spotlight; circle on wide, oval on narrow. */
+.services-bg-image {
+  mask-image: radial-gradient(
+    ellipse 72% 48% at 50% 48%,
+    #000 0%,
+    #000 28%,
+    rgb(0 0 0 / 0.65) 48%,
+    rgb(0 0 0 / 0.1) 72%,
+    transparent 92%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 72% 48% at 50% 48%,
+    #000 20%,
+    #000 8%,
+    rgb(0 0 0 / 0.54) 54%,
+    rgb(0 0 0 / 0.) 62%,
+    transparent 72%
+  );
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+@media (min-width: 1024px) {
+  .services-bg-image {
+    mask-image: radial-gradient(
+      circle 30% at 50% 48%,
+      #000 0%,
+      #000 38%,
+      rgb(0 0 0 / 0.6) 58%,
+      rgb(0 0 0 / 0.25) 72%,
+      transparent 99%
+    );
+    -webkit-mask-image: radial-gradient(
+      circle 30% at 50% 48%,
+      #000 0%,
+      #000 38%,
+      rgb(0 0 0 / 0.6) 58%,
+      rgb(0 0 0 / 0.25) 72%,
+      transparent 84%
+    );
+  }
 }
 
 /* Lenis recommended baseline */
@@ -381,4 +455,42 @@ html.lenis body {
 
 .premium-card:hover::after {
   opacity: 1;
+}
+
+/* Modular grid — logo watermark with a metallic light sweep */
+.grid-cell-logo::after,
+.grid-cell-logo::before {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  pointer-events: none;
+}
+
+/* Resting state: faint logo, like brushed metal */
+.grid-cell-logo::after {
+  background: url("/logo-grid.svg") center / contain no-repeat;
+  opacity: 0.08;
+}
+
+/* The travelling highlight — a bright diagonal band clipped to the logo shape */
+.grid-cell-logo::before {
+  background: linear-gradient(
+    115deg,
+    transparent 46%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 54%
+  );
+  background-repeat: no-repeat;       /* ← stops the multi-pass */
+  background-size: 300% 100%;
+  background-position: 250% 0;
+  -webkit-mask: url("/logo-grid.svg") center / contain no-repeat;
+  mask: url("/logo-grid.svg") center / contain no-repeat;
+  animation: metal-sweep 9s linear infinite;
+  animation-delay: var(--sweep-delay, 9s);
+}
+
+@keyframes metal-sweep {
+  0%   { background-position: 250% 0; }   /* fully off the right — invisible */
+  70%  { background-position: -150% 0; }  /* fully off the left — invisible */
+  100% { background-position: -150% 0; }  /* stays off until next loop */
 }

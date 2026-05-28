@@ -18,6 +18,7 @@ const team = [
 export function SiteFooter() {
   return (
     <footer role="contentinfo" className="border-t border-border bg-background text-foreground">
+      
       <div className="mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-24">
         <div className="grid gap-14 md:grid-cols-12">
           <div className="md:col-span-5">
