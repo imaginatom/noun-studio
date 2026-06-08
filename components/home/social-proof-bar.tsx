@@ -92,6 +92,7 @@ export function SocialProofBar() {
   return (
     <section
       ref={sectionRef}
+      data-grid-tier="bleed"
       className="relative overflow-hidden bg-[#F7F5F2] py-14 md:py-20"
     >
       {/* GRID BACKGROUND */}

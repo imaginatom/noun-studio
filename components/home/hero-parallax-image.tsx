@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import Image from "next/image"
+import { ProjectImage } from "@/components/project-image"
 
 type HeroParallaxImageProps = {
   src: string
@@ -62,7 +62,7 @@ export function HeroParallaxImage({ src, alt }: HeroParallaxImageProps) {
         className="relative h-[120%] w-full will-change-transform"
         style={{ transform: "translate3d(0, 0, 0) scale(1.08)" }}
       >
-        <Image
+        <ProjectImage
           src={src}
           alt={alt}
           fill

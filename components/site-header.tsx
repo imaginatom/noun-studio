@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import {
@@ -11,13 +10,13 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import { HoverFillLink } from "@/components/hover-fill-link"
 import { SiteLogo } from "@/components/site-logo"
 
 const navLinks = [
   { href: "/", label: "Accueil" },
   { href: "/architecture", label: "Architecture" },
   { href: "/realisations", label: "Portfolio" },
-  { href: "/contact", label: "Contact" },
 ]
 
 const SCROLL_DELTA = 8
@@ -81,7 +80,7 @@ export function SiteHeader() {
         !showHeader && "-translate-y-full",
         isTransparent
           ? "bg-transparent py-6"
-          : "bg-background/85 backdrop-blur-xl py-4 border-b border-border/60",
+          : "bg-background/90 backdrop-blur-md py-4 border-b border-border/60",
       )}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
@@ -94,45 +93,28 @@ export function SiteHeader() {
           {navLinks.map((link) => {
             const active = pathname === link.href
             return (
-              <Link
+              <HoverFillLink
                 key={link.href}
                 href={link.href}
+                active={active}
+                variant={isTransparent ? "nav-on-dark" : "nav-on-light"}
                 aria-current={active ? "page" : undefined}
-                className={cn(
-                  "relative text-[13px] font-medium tracking-wide transition-colors",
-                  isTransparent
-                    ? active
-                      ? "text-background"
-                      : "text-background/70 hover:text-background"
-                    : active
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground",
-                )}
+                className="text-[13px] font-medium tracking-wide"
               >
                 {link.label}
-                <span
-                  className={cn(
-                    "absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 transition-transform duration-300",
-                    isTransparent ? "bg-background" : "bg-foreground",
-                    active && "scale-x-100",
-                  )}
-                />
-              </Link>
+              </HoverFillLink>
             )
           })}
         </nav>
 
         <div className="hidden items-center gap-6 lg:flex">
-          <Link
+          <HoverFillLink
             href="/contact"
-            className={cn(
-              "group inline-flex items-center gap-2 text-[13px] font-medium tracking-wide transition-opacity hover:opacity-70",
-              isTransparent ? "text-background" : "text-foreground",
-            )}
+            variant={isTransparent ? "dark" : "light"}
+            className="text-[13px] font-medium tracking-wide"
           >
-            <span className="rule" aria-hidden="true" />
             Prendre rendez-vous
-          </Link>
+          </HoverFillLink>
         </div>
 
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -166,17 +148,18 @@ export function SiteHeader() {
                 <ul className="flex flex-col gap-7">
                   {navLinks.map((link, i) => (
                     <li key={link.href}>
-                      <Link
+                      <HoverFillLink
                         href={link.href}
+                        variant="dark"
                         onClick={() => setSheetOpen(false)}
                         aria-current={pathname === link.href ? "page" : undefined}
-                        className="group inline-flex items-baseline gap-4 font-serif text-3xl font-light transition-opacity hover:opacity-70"
+                        className="font-serif text-3xl font-light"
                       >
                         <span className="text-[10px] tracking-[0.3em] text-background/40">
                           {String(i + 1).padStart(2, "0")}
                         </span>
                         {link.label}
-                      </Link>
+                      </HoverFillLink>
                     </li>
                   ))}
                 </ul>

@@ -1,22 +1,32 @@
-import Image from "next/image"
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import type { ImageCtaContent } from "@/components/image-cta-section"
-import { Parallax } from "@/components/motion"
+import { ProjectImage } from "@/components/project-image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Parallax } from "@/components/motion";
+
+type ImageCtaContent = {
+  phrase: string;
+  backgroundImage: {
+    src: string;
+    alt: string;
+  };
+  primaryCtaLabel: string;
+  primaryCtaHref: string;
+};
+
 type ArchitectureCtaSectionProps = {
-  content: ImageCtaContent
-  chapter?: string
-  label?: string
-  quote?: string
-}
+  content: ImageCtaContent;
+  chapter?: string;
+  label?: string;
+  quote?: string;
+};
 
 function ChapterHeader({
   chapter,
   label,
 }: {
-  chapter: string
-  label?: string
+  chapter: string;
+  label?: string;
 }) {
   return (
     <div className="flex flex-col items-center text-center">
@@ -36,7 +46,7 @@ function ChapterHeader({
         </span>
       )}
     </div>
-  )
+  );
 }
 
 export function ArchitectureCtaSection({
@@ -48,7 +58,7 @@ export function ArchitectureCtaSection({
   return (
     <section data-snap-soft className="relative overflow-hidden py-20 lg:py-28">
       <Parallax y={-0.12} scaleFrom={0.06} className="absolute inset-0">
-        <Image
+        <ProjectImage
           src={content.backgroundImage.src}
           alt={content.backgroundImage.alt}
           fill
@@ -88,5 +98,5 @@ export function ArchitectureCtaSection({
         </div>
       </div>
     </section>
-  )
+  );
 }

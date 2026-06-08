@@ -9,9 +9,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { ImageUpload } from "@/components/admin/image-upload"
 import { createSupabaseBrowserClient } from "@/lib/supabase/client"
 import {
+  MAX_GALLERY_IMAGES,
   mergePortfolioContent,
   portfolioPageDefaults,
   portfolioSectionOrder,
+  type GalleryImage,
+  type GalleryImageAspect,
   type PortfolioPageContent,
   type PortfolioPageSectionKey,
 } from "@/lib/content/portfolio"
@@ -52,8 +55,15 @@ const createEmptyProject = (): PortfolioPageContent["gallery"]["projects"][numbe
   description: "",
   location: "",
   category: "",
-  image: { src: "", alt: "", path: null },
+  year: "",
+  gallery: [createEmptyGalleryImage()],
 })
+
+function createEmptyGalleryImage(): GalleryImage {
+  return { src: "", alt: "", path: null, title: "", definition: "", aspect: "4/3" }
+}
+
+const ASPECT_OPTIONS: GalleryImageAspect[] = ["3/4", "4/3", "1/1"]
 
 export default function AdminPortfolioEditor() {
   const supabase = useMemo(() => createSupabaseBrowserClient(), [])
@@ -374,19 +384,17 @@ export default function AdminPortfolioEditor() {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor={`portfolio-project-image-alt-${index}`}>Image alt text</Label>
+                          <Label htmlFor={`portfolio-project-year-${index}`}>Year</Label>
                           <Input
-                            id={`portfolio-project-image-alt-${index}`}
-                            value={project.image.alt}
+                            id={`portfolio-project-year-${index}`}
+                            value={project.year}
+                            placeholder="2024"
                             onChange={(event) =>
                               updateSection("gallery", (prev) => ({
                                 ...prev,
                                 projects: updateListItem(prev.projects, index, {
                                   ...project,
-                                  image: {
-                                    ...project.image,
-                                    alt: event.target.value,
-                                  },
+                                  year: event.target.value,
                                 }),
                               }))
                             }
@@ -409,26 +417,128 @@ export default function AdminPortfolioEditor() {
                           }
                         />
                       </div>
-                      <ImageUpload
-                        label="Project image"
-                        value={{
-                          src: project.image.src,
-                          path: project.image.path ?? null,
-                        }}
-                        onChange={(nextValue) =>
-                          updateSection("gallery", (prev) => ({
-                            ...prev,
-                            projects: updateListItem(prev.projects, index, {
-                              ...project,
-                              image: {
-                                ...project.image,
-                                src: nextValue.src,
-                                path: nextValue.path ?? null,
-                              },
-                            }),
-                          }))
-                        }
-                      />
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <Label>Images ({project.gallery.length}/{MAX_GALLERY_IMAGES})</Label>
+                        </div>
+                        {project.gallery.map((image, imageIndex) => {
+                          const updateImage = (next: Partial<GalleryImage>) =>
+                            updateSection("gallery", (prev) => ({
+                              ...prev,
+                              projects: updateListItem(prev.projects, index, {
+                                ...project,
+                                gallery: updateListItem(project.gallery, imageIndex, {
+                                  ...image,
+                                  ...next,
+                                }),
+                              }),
+                            }))
+                          return (
+                            <div
+                              key={`portfolio-project-${index}-image-${imageIndex}`}
+                              className="space-y-3 rounded-md border border-border/70 bg-muted/20 p-3"
+                            >
+                              <div className="flex items-center justify-between gap-3">
+                                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                  Image {imageIndex + 1}
+                                </p>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive"
+                                  onClick={() =>
+                                    updateSection("gallery", (prev) => ({
+                                      ...prev,
+                                      projects: updateListItem(prev.projects, index, {
+                                        ...project,
+                                        gallery: removeListItem(project.gallery, imageIndex),
+                                      }),
+                                    }))
+                                  }
+                                >
+                                  Remove image
+                                </Button>
+                              </div>
+                              <ImageUpload
+                                label="File"
+                                value={{ src: image.src, path: image.path ?? null }}
+                                onChange={(nextValue) =>
+                                  updateImage({ src: nextValue.src, path: nextValue.path ?? null })
+                                }
+                              />
+                              <div className="grid gap-3 md:grid-cols-2">
+                                <div className="space-y-2">
+                                  <Label htmlFor={`portfolio-project-${index}-image-${imageIndex}-alt`}>
+                                    Alt text
+                                  </Label>
+                                  <Input
+                                    id={`portfolio-project-${index}-image-${imageIndex}-alt`}
+                                    value={image.alt}
+                                    onChange={(event) => updateImage({ alt: event.target.value })}
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor={`portfolio-project-${index}-image-${imageIndex}-aspect`}>
+                                    Aspect ratio
+                                  </Label>
+                                  <select
+                                    id={`portfolio-project-${index}-image-${imageIndex}-aspect`}
+                                    value={image.aspect ?? "4/3"}
+                                    onChange={(event) =>
+                                      updateImage({ aspect: event.target.value as GalleryImageAspect })
+                                    }
+                                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                  >
+                                    {ASPECT_OPTIONS.map((aspect) => (
+                                      <option key={aspect} value={aspect}>
+                                        {aspect}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor={`portfolio-project-${index}-image-${imageIndex}-title`}>
+                                  Title (optional)
+                                </Label>
+                                <Input
+                                  id={`portfolio-project-${index}-image-${imageIndex}-title`}
+                                  value={image.title ?? ""}
+                                  onChange={(event) => updateImage({ title: event.target.value })}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor={`portfolio-project-${index}-image-${imageIndex}-definition`}>
+                                  Definition (optional)
+                                </Label>
+                                <Textarea
+                                  id={`portfolio-project-${index}-image-${imageIndex}-definition`}
+                                  value={image.definition ?? ""}
+                                  onChange={(event) => updateImage({ definition: event.target.value })}
+                                />
+                              </div>
+                            </div>
+                          )
+                        })}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={project.gallery.length >= MAX_GALLERY_IMAGES}
+                          onClick={() =>
+                            updateSection("gallery", (prev) => ({
+                              ...prev,
+                              projects: updateListItem(prev.projects, index, {
+                                ...project,
+                                gallery: [...project.gallery, createEmptyGalleryImage()],
+                              }),
+                            }))
+                          }
+                        >
+                          + Add image
+                        </Button>
+                      </div>
                   </div>
                 ))}
                 <div className="flex justify-start">

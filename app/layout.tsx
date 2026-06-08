@@ -1,22 +1,22 @@
-import React from "react"
-import type { Metadata, Viewport } from "next"
-import { Inter, Cormorant_Garamond } from "next/font/google"
-import { SiteHeader } from "@/components/site-header"
-import { SiteFooter } from "@/components/site-footer"
-import { FloatingCTA } from "@/components/floating-cta"
-import { BackToTop } from "@/components/back-to-top"
-import { ScrollAnimations } from "@/components/scroll-animations"
-import { SitePreloader } from "@/components/site-preloader"
-import { SmoothScroll } from "@/components/smooth-scroll"
-import { MagneticScroll } from "@/components/motion"
-import "./globals.css"
+import React from "react";
+import type { Metadata, Viewport } from "next";
+import { Inter, Cormorant_Garamond } from "next/font/google";
+import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
+import { FloatingCTA } from "@/components/floating-cta";
+import { BackToTop } from "@/components/back-to-top";
+import { SitePreloader } from "@/components/site-preloader";
+import { SmoothScrollProvider } from "@/components/smooth-scroll-provider";
+import { MagneticScroll } from "@/components/motion";
+import { GridOverlay } from "@/components/dev/grid-overlay";
+import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
   variable: "--font-sans",
   display: "swap",
-})
+});
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -24,7 +24,7 @@ const cormorant = Cormorant_Garamond({
   style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
-})
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://noun-studio.com"),
@@ -77,14 +77,14 @@ export const metadata: Metadata = {
     description:
       "Cabinet d'architecture et studio de design \u00e0 Oran, Alg\u00e9rie. Architecture et contenu culturel.",
     images: ["/images/og-image.jpg"],
-  }
-}
+  },
+};
 
 export const viewport: Viewport = {
   themeColor: "#0a0a0a",
   width: "device-width",
   initialScale: 1,
-}
+};
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -108,12 +108,12 @@ const jsonLd = {
   },
   areaServed: ["Oran", "Alg\u00e9rie"],
   priceRange: "$$",
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="fr-DZ" className={`${inter.variable} ${cormorant.variable}`}>
@@ -124,16 +124,18 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased">
-        <SitePreloader />
-        <SmoothScroll />
-        <MagneticScroll />
-        <SiteHeader />
-        <main id="main-content">{children}</main>
-        <SiteFooter />
-        <FloatingCTA />
-        <BackToTop />
-        <ScrollAnimations />
+        {process.env.NODE_ENV === "development" && <GridOverlay />}
+
+        <SmoothScrollProvider>
+          <SitePreloader />
+          <MagneticScroll />
+          <SiteHeader />
+          <main id="main-content">{children}</main>
+          <SiteFooter />
+          <FloatingCTA />
+          <BackToTop />
+        </SmoothScrollProvider>
       </body>
     </html>
-  )
+  );
 }

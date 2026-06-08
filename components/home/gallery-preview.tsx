@@ -1,56 +1,57 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { ArrowUpRight } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
-import { SectionChapterIntro } from "@/components/home/section-transition"
-import { ModularGridOverlay } from "@/components/ModularGridBackground"
+import { useEffect, useRef, useState } from "react";
+import { ProjectImage } from "@/components/project-image";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage";
+import { SectionChapterIntro } from "@/components/home/section-transition";
+import { ModularGridOverlay } from "@/components/ModularGridBackground";
 
-type GalleryContent = HomePageContent["galleryPreview"]
+type GalleryContent = HomePageContent["galleryPreview"];
 
 type GalleryRow = {
-  src: string
-  alt: string
-  label: string
-}
+  src: string;
+  alt: string;
+  label: string;
+  slug: string;
+};
 
 type RowMotion = {
-  progress: number
-  opacity: number
-  translateY: number
-  parallaxY: number
-}
+  progress: number;
+  opacity: number;
+  translateY: number;
+  parallaxY: number;
+};
 
 const hiddenRowMotion: RowMotion = {
   progress: 0,
   opacity: 0,
   translateY: 80,
   parallaxY: 60,
-}
+};
 
 const settledRowMotion: RowMotion = {
   progress: 1,
   opacity: 1,
   translateY: 0,
   parallaxY: 0,
-}
+};
 
 function computeRowMotion(rect: DOMRect, vh: number): RowMotion {
-  const center = rect.top + rect.height / 2
-  const focus = vh * 0.55
-  const range = vh * 0.7
-  const linear = Math.max(0, Math.min(1, 1 - Math.abs(center - focus) / range))
+  const center = rect.top + rect.height / 2;
+  const focus = vh * 0.55;
+  const range = vh * 0.7;
+  const linear = Math.max(0, Math.min(1, 1 - Math.abs(center - focus) / range));
 
-  const remaining = 1 - linear
+  const remaining = 1 - linear;
   return {
     progress: linear,
     opacity: 0.18 + linear * 0.82,
     translateY: remaining * 80,
     parallaxY: (center - focus) * 0.08,
-  }
+  };
 }
 
 function GalleryShowcaseRow({
@@ -58,51 +59,51 @@ function GalleryShowcaseRow({
   row,
   total,
 }: {
-  index: number
-  row: GalleryRow
-  total: number
+  index: number;
+  row: GalleryRow;
+  total: number;
 }) {
-  const ref = useRef<HTMLLIElement>(null)
-  const [motion, setMotion] = useState<RowMotion>(hiddenRowMotion)
-  const [loaded, setLoaded] = useState(false)
-  const frame = useRef<number | null>(null)
-  const numberLabel = String(index + 1).padStart(2, "0")
-  const totalLabel = String(total).padStart(2, "0")
+  const ref = useRef<HTMLLIElement>(null);
+  const [motion, setMotion] = useState<RowMotion>(hiddenRowMotion);
+  const [loaded, setLoaded] = useState(false);
+  const frame = useRef<number | null>(null);
+  const numberLabel = String(index + 1).padStart(2, "0");
+  const totalLabel = String(total).padStart(2, "0");
 
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
+    const el = ref.current;
+    if (!el) return;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setMotion(settledRowMotion)
-      return
+      setMotion(settledRowMotion);
+      return;
     }
 
     const update = () => {
-      const vh = window.innerHeight
-      setMotion(computeRowMotion(el.getBoundingClientRect(), vh))
-      frame.current = null
-    }
+      const vh = window.innerHeight;
+      setMotion(computeRowMotion(el.getBoundingClientRect(), vh));
+      frame.current = null;
+    };
 
     const onScroll = () => {
-      if (frame.current !== null) return
-      frame.current = window.requestAnimationFrame(update)
-    }
+      if (frame.current !== null) return;
+      frame.current = window.requestAnimationFrame(update);
+    };
 
-    update()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", update)
-    window.__lenis?.on("scroll", onScroll)
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", update);
+    window.__lenis?.on("scroll", onScroll);
 
     return () => {
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", update)
-      window.__lenis?.off("scroll", onScroll)
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", update);
+      window.__lenis?.off("scroll", onScroll);
       if (frame.current !== null) {
-        window.cancelAnimationFrame(frame.current)
+        window.cancelAnimationFrame(frame.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   return (
     <li
@@ -115,8 +116,8 @@ function GalleryShowcaseRow({
       }}
     >
       <Link
-        href="/realisations"
-        aria-label={`Voir le projet ${row.label}`}
+        href={`/realisations/${row.slug}`}
+        aria-label={`Voir le projet ${row.alt}`}
         className="grid grid-cols-12 items-center gap-6 py-10 lg:py-14 xl:py-16"
       >
         <span
@@ -157,9 +158,12 @@ function GalleryShowcaseRow({
           }}
         >
           {!loaded ? (
-            <div className="absolute inset-0 bg-background/[0.06]" aria-hidden="true" />
+            <div
+              className="absolute inset-0 bg-background/[0.06]"
+              aria-hidden="true"
+            />
           ) : null}
-          <Image
+          <ProjectImage
             src={row.src}
             alt={row.alt}
             fill
@@ -187,7 +191,7 @@ function GalleryShowcaseRow({
         </div>
       </Link>
     </li>
-  )
+  );
 }
 
 function GalleryStickyIntro({ content }: { content: GalleryContent }) {
@@ -195,7 +199,10 @@ function GalleryStickyIntro({ content }: { content: GalleryContent }) {
     <div className="lg:sticky lg:top-28 lg:flex lg:max-h-[calc(100dvh-7rem)] lg:flex-col lg:justify-center">
       <div className="flex flex-col gap-8">
         <p className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.32em] text-background/65">
-          <span className="inline-block h-px w-8 bg-background/40" aria-hidden="true" />
+          <span
+            className="inline-block h-px w-8 bg-background/40"
+            aria-hidden="true"
+          />
           {content.eyebrow}
         </p>
         <h2
@@ -219,7 +226,7 @@ function GalleryStickyIntro({ content }: { content: GalleryContent }) {
         </Link>
       </div>
     </div>
-  )
+  );
 }
 
 export function GalleryPreview({
@@ -229,20 +236,21 @@ export function GalleryPreview({
   chapterLabel,
   chapterQuote,
 }: {
-  content?: GalleryContent
-  images?: Array<{ src: string; alt: string; label: string }>
-  chapter?: string
-  chapterLabel?: string
-  chapterQuote?: string
+  content?: GalleryContent;
+  images?: Array<{ src: string; alt: string; label: string; slug: string }>;
+  chapter?: string;
+  chapterLabel?: string;
+  chapterQuote?: string;
 }) {
   if (images.length === 0) {
-    return null
+    return null;
   }
 
-  const rows = images.slice(0, 6)
+  const rows = images.slice(0, 6);
 
   return (
     <section
+      data-grid-tier="bleed"
       data-snap-soft
       className="gallery-preview-surface relative isolate overflow-hidden text-background"
       aria-label={content.title}
@@ -250,49 +258,49 @@ export function GalleryPreview({
       <ModularGridOverlay logoRatio={0.05} />
 
       <div className="relative z-[1]">
-      {chapter && (
-        <SectionChapterIntro
-          chapter={chapter}
-          label={chapterLabel}
-          quote={chapterQuote}
-          isDark
-          embedded
-          className="relative"
-        />
-      )}
-
-      <div
-        className={cn(
-          "relative mx-auto max-w-7xl px-6 lg:px-10",
-          chapter ? "pt-16 pb-24 lg:pt-20 lg:pb-32" : "py-24 lg:py-32",
+        {chapter && (
+          <SectionChapterIntro
+            chapter={chapter}
+            label={chapterLabel}
+            quote={chapterQuote}
+            isDark
+            embedded
+            className="relative"
+          />
         )}
-      >
-        <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-4">
-            <GalleryStickyIntro content={content} />
-          </div>
 
-          <div className="lg:col-span-8">
-            <ul className="border-t border-background/15">
-              {rows.map((row, index) => (
-                <GalleryShowcaseRow
-                  key={`${row.src}-${index}`}
-                  index={index}
-                  row={row}
-                  total={rows.length}
-                />
-              ))}
-            </ul>
+        <div
+          className={cn(
+            "relative mx-auto max-w-7xl px-6 lg:px-10",
+            chapter ? "pt-16 pb-24 lg:pt-20 lg:pb-32" : "py-24 lg:py-32",
+          )}
+        >
+          <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-4">
+              <GalleryStickyIntro content={content} />
+            </div>
 
-            <div className="mt-12 flex items-center justify-between border-t border-background/15 pt-8 text-[10px] font-medium uppercase tracking-[0.32em] text-background/55">
-              <span>Index — sélection</span>
-              <span>Oran · Algérie</span>
-              <span>{new Date().getFullYear()}</span>
+            <div className="lg:col-span-8">
+              <ul className="border-t border-background/15">
+                {rows.map((row, index) => (
+                  <GalleryShowcaseRow
+                    key={`${row.src}-${index}`}
+                    index={index}
+                    row={row}
+                    total={rows.length}
+                  />
+                ))}
+              </ul>
+
+              <div className="mt-12 flex items-center justify-between border-t border-background/15 pt-8 text-[10px] font-medium uppercase tracking-[0.32em] text-background/55">
+                <span>Index — sélection</span>
+                <span>Oran · Algérie</span>
+                <span>{new Date().getFullYear()}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      </div>
     </section>
-  )
+  );
 }

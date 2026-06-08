@@ -37,7 +37,7 @@ export function TestimonialsSection({
   const active = testimonials[current]
 
   return (
-    <section id="testimonials-section" className="relative bg-background">
+    <section id="testimonials-section" data-grid-tier="wide" className="relative bg-background">
       {chapter && (
         <SectionChapterIntro
           chapter={chapter}
@@ -48,36 +48,44 @@ export function TestimonialsSection({
       )}
       <div
         className={cn(
-          "mx-auto max-w-5xl px-6 lg:px-10",
+          "section-shell",
           chapter ? "pb-24 pt-24 lg:pb-32 lg:pt-32" : "py-24 lg:py-32",
         )}
       >
-        <div className="animate-on-scroll mb-16 flex items-baseline justify-between border-b border-border pb-6">
-          <p className="eyebrow">— {content.eyebrow}</p>
-          <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
-            {String(current + 1).padStart(2, "0")} / {String(testimonials.length).padStart(2, "0")}
+        <div className="stagger-children mb-16 flex items-baseline justify-between border-b border-border pb-6">
+          <p className="animate-on-scroll animate-fade-left eyebrow">— {content.eyebrow}</p>
+          <p className="animate-on-scroll animate-fade-right text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+            {String(current + 1).padStart(2, "0")} /{" "}
+            {String(testimonials.length).padStart(2, "0")}
           </p>
         </div>
 
-        <div className="animate-on-scroll">
-          <h2 className="sr-only">{content.title}</h2>
+        <div className="animate-on-scroll animate-reveal-text">
+          <div key={current} className="testimonial-slide-in">
+            <h2 className="sr-only">{content.title}</h2>
 
-          <blockquote className="font-serif text-3xl font-light italic leading-[1.25] text-foreground md:text-4xl lg:text-5xl">
-            <span aria-hidden="true" className="mr-1 text-muted-foreground/70">“</span>
-            {active.text}
-            <span aria-hidden="true" className="ml-1 text-muted-foreground/70">”</span>
-          </blockquote>
+            <blockquote className="font-serif text-3xl font-light italic leading-[1.25] text-foreground md:text-4xl lg:text-5xl">
+              <span aria-hidden="true" className="mr-1 text-muted-foreground/70">
+                “
+              </span>
+              {active.text}
+              <span aria-hidden="true" className="ml-1 text-muted-foreground/70">
+                ”
+              </span>
+            </blockquote>
 
-          <div className="mt-14 flex items-end justify-between gap-6">
-            <div>
-              <p className="text-sm font-medium tracking-wide text-foreground">{active.name}</p>
-              <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
-                {active.city}
-              </p>
-            </div>
+            <div className="mt-14 flex items-end justify-between gap-6">
+              <div>
+                <p className="text-sm font-medium tracking-wide text-foreground">
+                  {active.name}
+                </p>
+                <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+                  {active.city}
+                </p>
+              </div>
 
-            {testimonials.length > 1 && (
-              <div className="flex items-center gap-3">
+              {testimonials.length > 1 && (
+                <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={prev}
@@ -94,8 +102,9 @@ export function TestimonialsSection({
                 >
                   <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
                 </button>
-              </div>
-            )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

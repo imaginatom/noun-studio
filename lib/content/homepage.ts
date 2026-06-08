@@ -19,17 +19,13 @@ export type HomePageContent = {
     }>
   }
   services: {
+    ctaLabel: string
     eyebrow: string
     title: string
-    ctaLabel: string
     items: Array<{
+      image: any
       title: string
       description: string
-      image?: {
-        src: string
-        alt: string
-        path?: string | null
-      }
     }>
   }
   whyUs: {
@@ -126,19 +122,19 @@ export const homePageDefaults: HomePageContent = {
   services: {
     eyebrow: 'Nos expertises',
     title: 'Un studio multidisciplinaire au service de vos projets',
-    ctaLabel: 'Parlons de votre projet',
     items: [
       {
         title: 'Architecture',
-        description:
-          'Conception et suivi de projets architecturaux résidentiels, commerciaux et de rénovation. Du diagnostic à la livraison.',
+        description: 'Conception et suivi de projets architecturaux résidentiels, commerciaux et de rénovation. Du diagnostic à la livraison.',
+        image: undefined
       },
       {
         title: 'Contenu Culturel',
-        description:
-          "Production de contenu autour de l'architecture, du patrimoine algérien et de la culture du design.",
+        description: "Production de contenu autour de l'architecture, du patrimoine algérien et de la culture du design.",
+        image: undefined
       },
     ],
+    ctaLabel: ""
   },
   whyUs: {
     eyebrow: 'Notre approche',
@@ -284,15 +280,17 @@ const mergeList = <T extends Record<string, unknown>>(
     return []
   }
   const template = fallback[0]
-  return value.flatMap((entry, index) => {
+  return value.flatMap((entry, index): T[] => {
     if (!isRecord(entry)) {
       return []
     }
     const item = fallback[index] ?? template
-    return {
-      ...(item ?? {}),
-      ...(entry as Partial<T>),
-    } as T
+    return [
+      {
+        ...(item ?? {}),
+        ...(entry as Partial<T>),
+      } as T,
+    ]
   })
 }
 

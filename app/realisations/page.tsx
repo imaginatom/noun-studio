@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
 import { RealisationsGallery } from "@/components/realisations-gallery"
 import Link from "next/link"
-import { ArrowUpRight, ChevronRight, Mail } from "lucide-react"
-import { createSupabaseServerClient } from "@/lib/supabase/server"
-import { mergePortfolioContent } from "@/lib/content/portfolio"
+import { ChevronRight, Mail } from "lucide-react"
+import { HoverFillLink } from "@/components/hover-fill-link"
+import { getPortfolioProjects } from "@/lib/portfolio-data"
 
 export const metadata: Metadata = {
   title: "Portfolio — Projets d'Architecture",
@@ -12,12 +12,7 @@ export const metadata: Metadata = {
 }
 
 export default async function RealisationsPage() {
-  const supabase = await createSupabaseServerClient()
-  const { data, error } = await supabase
-    .from("site_content")
-    .select("section, content")
-    .eq("page", "portfolio")
-  const content = mergePortfolioContent(error ? [] : data ?? [])
+  const { content, projects } = await getPortfolioProjects()
 
   return (
     <>
@@ -49,7 +44,7 @@ export default async function RealisationsPage() {
         </div>
       </section>
 
-      <RealisationsGallery categories={content.gallery.categories} projects={content.gallery.projects} />
+      <RealisationsGallery categories={content.gallery.categories} projects={projects} />
 
       {/* CTA — light section, separate from the projects grid */}
       <section className="border-t border-border bg-background py-20 lg:py-28">
@@ -64,23 +59,21 @@ export default async function RealisationsPage() {
             {content.cta.subtitle}
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-8">
-            <Link
+            <HoverFillLink
               href={content.cta.primaryCtaHref}
-              className="group inline-flex items-baseline gap-3 border-b border-foreground/30 pb-2 text-sm font-medium tracking-[0.12em] text-foreground transition-colors hover:border-foreground"
+              showArrow
+              className="tracking-[0.12em]"
             >
               {content.cta.primaryCtaLabel}
-              <ArrowUpRight
-                className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                strokeWidth={1.5}
-              />
-            </Link>
-            <a
+            </HoverFillLink>
+            <HoverFillLink
               href={`mailto:${content.cta.emailAddress}`}
-              className="group inline-flex items-center gap-3 border-b border-foreground/30 pb-2 text-sm font-medium tracking-[0.12em] text-foreground/85 transition-colors hover:border-foreground hover:text-foreground"
+              className="tracking-[0.12em]"
+              contentClassName="text-foreground/85 group-hover:text-background"
             >
               <Mail className="h-4 w-4" />
               {content.cta.emailLabel}
-            </a>
+            </HoverFillLink>
           </div>
         </div>
       </section>

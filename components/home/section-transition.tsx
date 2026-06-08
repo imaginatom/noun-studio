@@ -151,7 +151,7 @@ export function SectionChapterIntro({
       )}
 
       {hasSplitMedia ? (
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+        <div className="section-shell relative">
           <div className="grid items-center gap-10 lg:grid-cols-[2fr_3fr] lg:gap-14 xl:gap-20">
             <div
               className={cn(
@@ -188,7 +188,7 @@ export function SectionChapterIntro({
       ) : (
         <div
           className={cn(
-            "animate-on-scroll animate-fade relative mx-auto flex max-w-5xl flex-col px-6 lg:px-10",
+            "section-shell animate-on-scroll animate-fade relative flex flex-col",
             revealOnMount && "is-visible",
             resolvedAlign === "center" ? "items-center text-center" : "items-start text-left",
           )}
@@ -234,6 +234,7 @@ export function SectionTransition({
 
   return (
     <section
+      data-grid-tier="wide"
       className={cn("relative w-full overflow-hidden", surface.className, className)}
       style={surface.style}
     >

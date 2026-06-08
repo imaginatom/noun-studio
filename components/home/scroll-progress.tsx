@@ -1,21 +1,19 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 
 export function ScrollProgress() {
-  const [progress, setProgress] = useState(0)
+  const barRef = useRef<HTMLDivElement | null>(null)
   const frame = useRef<number | null>(null)
 
   useEffect(() => {
     const compute = () => {
+      const bar = barRef.current
+      if (!bar) return
       const doc = document.documentElement
       const max = doc.scrollHeight - doc.clientHeight
-      if (max <= 0) {
-        setProgress(0)
-        return
-      }
-      const next = Math.min(1, Math.max(0, doc.scrollTop / max))
-      setProgress(next)
+      const next = max > 0 ? Math.min(1, Math.max(0, doc.scrollTop / max)) : 0
+      bar.style.transform = `scaleY(${next})`
     }
 
     const onScroll = () => {
@@ -46,8 +44,9 @@ export function ScrollProgress() {
     >
       <div className="relative h-full w-full bg-foreground/10">
         <div
-          className="absolute left-0 top-0 w-full origin-top bg-foreground/60 transition-transform duration-150 ease-out"
-          style={{ transform: `scaleY(${progress})` }}
+          ref={barRef}
+          className="absolute left-0 top-0 w-full origin-top bg-foreground/60"
+          style={{ transform: "scaleY(0)" }}
         />
       </div>
     </div>
