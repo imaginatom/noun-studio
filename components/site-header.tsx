@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetTrigger,
   SheetTitle,
@@ -13,13 +14,26 @@ import { cn } from "@/lib/utils"
 import { HoverFillLink } from "@/components/hover-fill-link"
 import { SiteLogo } from "@/components/site-logo"
 
-const navLinks = [
-  { href: "/", label: "Accueil" },
-  { href: "/architecture", label: "Architecture" },
+const leftNavLinks = [
+  { href: "/architecture", label: "Services" },
   { href: "/realisations", label: "Portfolio" },
-]
+] as const
+
+const rightNavLinks = [
+  { href: "/#approche", label: "À propos" },
+  { href: "/contact", label: "Contact" },
+] as const
+
+const mobileNavLinks = [...leftNavLinks, ...rightNavLinks]
 
 const SCROLL_DELTA = 8
+
+function isNavActive(pathname: string, href: string) {
+  if (href === "/#approche") {
+    return pathname === "/"
+  }
+  return pathname === href
+}
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false)
@@ -70,6 +84,23 @@ export function SiteHeader() {
 
   const showHeader = sheetOpen || headerVisible
   const isTransparent = isHome && !scrolled && showHeader
+  const navVariant = isTransparent ? "nav-on-dark" : "nav-on-light"
+
+  const renderNavLink = (link: (typeof mobileNavLinks)[number]) => {
+    const active = isNavActive(pathname, link.href)
+    return (
+      <HoverFillLink
+        key={link.href}
+        href={link.href}
+        active={active}
+        variant={navVariant}
+        aria-current={active ? "page" : undefined}
+        className="text-[13px] font-medium tracking-wide"
+      >
+        {link.label}
+      </HoverFillLink>
+    )
+  }
 
   return (
     <header
@@ -83,102 +114,107 @@ export function SiteHeader() {
           : "bg-background/90 backdrop-blur-md py-4 border-b border-border/60",
       )}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-10">
-        <SiteLogo
-          variant={isTransparent ? "light" : "default"}
-          size="md"
-        />
-
-        <nav aria-label="Navigation principale" className="hidden items-center gap-10 lg:flex">
-          {navLinks.map((link) => {
-            const active = pathname === link.href
-            return (
-              <HoverFillLink
-                key={link.href}
-                href={link.href}
-                active={active}
-                variant={isTransparent ? "nav-on-dark" : "nav-on-light"}
-                aria-current={active ? "page" : undefined}
-                className="text-[13px] font-medium tracking-wide"
-              >
-                {link.label}
-              </HoverFillLink>
-            )
-          })}
-        </nav>
-
-        <div className="hidden items-center gap-6 lg:flex">
-          <HoverFillLink
-            href="/contact"
-            variant={isTransparent ? "dark" : "light"}
-            className="text-[13px] font-medium tracking-wide"
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+        <div className="relative flex h-10 items-center lg:grid lg:h-auto lg:grid-cols-[1fr_auto_1fr] lg:items-center">
+          <nav
+            aria-label="Navigation principale — gauche"
+            className="hidden items-center gap-10 lg:flex"
           >
-            Prendre rendez-vous
-          </HoverFillLink>
-        </div>
+            {leftNavLinks.map(renderNavLink)}
+          </nav>
 
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <button
-              className={cn(
-                "flex h-10 w-10 items-center justify-center transition-colors lg:hidden",
-                isTransparent ? "text-background" : "text-foreground",
-              )}
-              aria-label="Ouvrir le menu de navigation"
+          <div className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 lg:justify-self-center">
+            <SiteLogo
+              variant={isTransparent ? "light" : "default"}
+              size="sm"
+              className="lg:hidden"
+            />
+            <SiteLogo
+              variant={isTransparent ? "light" : "default"}
+              size="md"
+              className="hidden lg:inline-flex"
+            />
+          </div>
+
+          <div className="ml-auto flex items-center gap-6 lg:ml-0 lg:justify-self-end">
+            <nav
+              aria-label="Navigation principale — droite"
+              className="hidden items-center gap-10 lg:flex"
             >
-              <Menu className="h-5 w-5" strokeWidth={1.5} />
-            </button>
-          </SheetTrigger>
-          <SheetContent side="right" className="w-full bg-foreground p-0 text-background sm:max-w-md">
-            <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
-            <div className="flex h-full flex-col">
-              <div className="flex items-center justify-between px-8 py-6">
-                <SiteLogo variant="light" size="sm" />
+              {rightNavLinks.map(renderNavLink)}
+            </nav>
+
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+              <SheetTrigger asChild>
                 <button
-                  type="button"
-                  onClick={() => setSheetOpen(false)}
-                  className="flex h-10 w-10 items-center justify-center text-background/80 transition-colors hover:text-background"
-                  aria-label="Fermer le menu"
+                  className={cn(
+                    "flex h-10 w-10 shrink-0 items-center justify-center transition-colors lg:hidden",
+                    isTransparent ? "text-background" : "text-foreground",
+                  )}
+                  aria-label="Ouvrir le menu de navigation"
                 >
-                  <X className="h-5 w-5" strokeWidth={1.5} />
+                  <Menu className="h-5 w-5" strokeWidth={1.5} />
                 </button>
-              </div>
-
-              <nav aria-label="Navigation mobile" className="flex-1 px-8 py-12">
-                <ul className="flex flex-col gap-7">
-                  {navLinks.map((link, i) => (
-                    <li key={link.href}>
-                      <HoverFillLink
-                        href={link.href}
-                        variant="dark"
-                        onClick={() => setSheetOpen(false)}
-                        aria-current={pathname === link.href ? "page" : undefined}
-                        className="font-serif text-3xl font-light"
+              </SheetTrigger>
+              <SheetContent
+                side="right"
+                showCloseButton={false}
+                className="w-full bg-foreground p-0 text-background sm:max-w-md"
+              >
+                <SheetTitle className="sr-only">Menu de navigation</SheetTitle>
+                <div className="flex h-full flex-col">
+                  <div className="flex items-center justify-between px-6 py-5 sm:px-8 sm:py-6">
+                    <SiteLogo variant="light" size="sm" />
+                    <SheetClose asChild>
+                      <button
+                        type="button"
+                        className="flex h-10 w-10 items-center justify-center text-background/80 transition-colors hover:text-background"
+                        aria-label="Fermer le menu"
                       >
-                        <span className="text-[10px] tracking-[0.3em] text-background/40">
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        {link.label}
-                      </HoverFillLink>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
+                        <X className="h-5 w-5" strokeWidth={1.5} />
+                      </button>
+                    </SheetClose>
+                  </div>
 
-              <div className="border-t border-background/10 px-8 py-6">
-                <a
-                  href="mailto:contact@nounstudio.dz"
-                  className="block text-sm tracking-wide text-background/70 transition-colors hover:text-background"
-                >
-                  contact@nounstudio.dz
-                </a>
-                <p className="mt-2 text-[11px] uppercase tracking-[0.25em] text-background/40">
-                  Oran · Algérie
-                </p>
+                <nav aria-label="Navigation mobile" className="flex-1 px-8 py-12">
+                  <ul className="flex flex-col gap-7">
+                    {mobileNavLinks.map((link, i) => (
+                      <li key={link.href}>
+                        <HoverFillLink
+                          href={link.href}
+                          variant="dark"
+                          onClick={() => setSheetOpen(false)}
+                          aria-current={
+                            isNavActive(pathname, link.href) ? "page" : undefined
+                          }
+                          className="font-serif text-3xl font-light"
+                        >
+                          <span className="text-[10px] tracking-[0.3em] text-background/40">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          {link.label}
+                        </HoverFillLink>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+
+                <div className="border-t border-background/10 px-8 py-6">
+                  <a
+                    href="mailto:contact@nounstudio.dz"
+                    className="block text-sm tracking-wide text-background/70 transition-colors hover:text-background"
+                  >
+                    contact@nounstudio.dz
+                  </a>
+                  <p className="mt-2 text-[11px] uppercase tracking-[0.25em] text-background/40">
+                    Oran · Algérie
+                  </p>
+                </div>
               </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
       </div>
     </header>
   )

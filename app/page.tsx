@@ -57,8 +57,6 @@ export default async function HomePage() {
       <SocialProofBar />
 
       <SectionTransition
-        chapter="I"
-        label="Expertise"
         quote="Concevoir des lieux qui dialoguent avec leur contexte, leur histoire et celles et ceux qui les habitent."
         videoSrc="/archi-vid.mp4"
         sectionBg="background"
@@ -66,32 +64,16 @@ export default async function HomePage() {
 
       <ServicesOverview content={content.services} />
 
-      <WhyUsSection
-        content={content.whyUs}
-        chapter="II"
-        chapterLabel="Approche"
-      />
+      <WhyUsSection content={content.whyUs} />
 
-      <TestimonialsSection
-        content={content.testimonials}
-        chapter="III"
-        chapterLabel="Récits"
-        chapterQuote="Les témoignages de celles et ceux qui nous ont confié leurs projets."
-      />
+      <TestimonialsSection content={content.testimonials} />
 
       <GalleryPreview
         content={content.galleryPreview}
         images={previewImages}
-        chapter="IV"
-        chapterLabel="Portfolio"
-        chapterQuote="Une sélection silencieuse. Six gestes, six lieux, six histoires."
       />
 
-      <LocalSeoSection
-        content={content.localSeo}
-        chapter="V"
-        chapterLabel="Ancrage local"
-      />
+      <LocalSeoSection content={content.localSeo} />
 
       <ContactCtaSection content={content.contactCta} />
     </div>

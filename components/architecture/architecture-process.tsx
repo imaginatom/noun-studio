@@ -15,7 +15,7 @@ export function ArchitectureProcess({
   }
 
   return (
-    <section className="py-24 lg:py-32" style={{ backgroundColor: whyUsSectionBg }}>
+    <section className="section-padding" style={{ backgroundColor: whyUsSectionBg }}>
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="animate-on-scroll mb-14 max-w-2xl">
           <p className="eyebrow">— Process</p>

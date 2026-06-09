@@ -115,7 +115,7 @@ export function ArchitectureHero({
         <span className="h-16 w-px bg-background/30" aria-hidden="true" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-40 lg:px-10 lg:pb-28">
+      <div className="section-padding relative z-10 mx-auto w-full max-w-7xl px-6 lg:px-10">
         <nav
           aria-label="Fil d'Ariane"
           className="mb-8 overflow-hidden text-[10px] uppercase tracking-[0.22em] text-background/60 lg:hidden"

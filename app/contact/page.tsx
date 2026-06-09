@@ -56,18 +56,13 @@ const faqs = [
     answer:
       "Un projet d'architecture r\u00e9sidentiel, de la conception \u00e0 la livraison des plans, peut prendre 2 \u00e0 4 mois. Le suivi de chantier d\u00e9pend de la dur\u00e9e de construction.",
   },
-  {
-    question: "Qui compose l'\u00e9quipe de Noun Studio\u00a0?",
-    answer:
-      "Le studio est dirig\u00e9 par SAHNOUNE Mohammed, architecte agr\u00e9\u00e9. Il est accompagn\u00e9 d'Adda Echikh en direction artistique et graphisme, et de Sid Ahmed Lakber pour le d\u00e9veloppement web et digital.",
-  },
 ]
 
 export default function ContactPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-card pt-32 pb-14 lg:pt-40 lg:pb-16">
+      <section className="section-padding-header bg-card">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <nav aria-label="Fil d'Ariane" className="mb-4 flex items-center gap-1.5 text-xs text-muted-foreground">
             <Link href="/" className="transition-colors hover:text-foreground">Accueil</Link>
@@ -111,7 +106,7 @@ export default function ContactPage() {
       </section>
 
       {/* Form */}
-      <section className="py-20 lg:py-28">
+      <section className="section-padding">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="flex flex-col gap-12 lg:flex-row lg:gap-16">
             <div className="lg:w-1/2">
@@ -145,32 +140,13 @@ export default function ContactPage() {
                   ))}
                 </div>
               </div>
-
-              {/* Team card */}
-              <div className="rounded-2xl border border-border bg-card p-6 transition-all duration-300 ease-out hover:shadow-md hover:border-primary/20">
-                <h3 className="font-serif text-lg font-bold text-foreground">{"L'\u00e9quipe"}</h3>
-                <div className="mt-4 flex flex-col gap-4">
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">SAHNOUNE Mohammed</p>
-                    <p className="text-xs text-muted-foreground">{"Architecte agr\u00e9\u00e9 & Directeur Cr\u00e9atif"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Adda Echikh</p>
-                    <p className="text-xs text-muted-foreground">{"Designer Graphique & Direction Artistique"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Sid Ahmed Lakber</p>
-                    <p className="text-xs text-muted-foreground">{"D\u00e9veloppement Web & Digital"}</p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="border-t border-border bg-card py-20 lg:py-28">
+      <section className="section-padding border-t border-border bg-card">
         <div className="mx-auto max-w-3xl px-4 lg:px-8">
           <div className="text-center">
             <p className="text-sm font-medium uppercase tracking-widest text-accent">FAQ</p>

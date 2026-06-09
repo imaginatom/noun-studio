@@ -17,7 +17,7 @@ export default async function RealisationsPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-background pt-28 pb-16 lg:pt-36 lg:pb-20">
+      <section className="section-padding-header bg-background">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <nav aria-label="Fil d'Ariane" className="mb-8 flex items-center gap-1.5 text-xs text-muted-foreground">
             <Link href="/" className="transition-colors hover:text-foreground">
@@ -47,7 +47,7 @@ export default async function RealisationsPage() {
       <RealisationsGallery categories={content.gallery.categories} projects={projects} />
 
       {/* CTA — light section, separate from the projects grid */}
-      <section className="border-t border-border bg-background py-20 lg:py-28">
+      <section className="section-padding border-t border-border bg-background">
         <div className="mx-auto max-w-4xl px-6 text-center lg:px-10">
           <h2
             className="font-serif text-[clamp(2rem,5vw,4rem)] font-light leading-[0.95] text-foreground text-balance"

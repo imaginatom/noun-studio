@@ -88,6 +88,40 @@ export const revealWordsOnTimeline = (
   );
 };
 
+export type RevealWordsOnScrollOptions = Partial<{
+  start: string;
+  once: boolean;
+  duration: number;
+}>;
+
+export const revealWordsOnScroll = (
+  element: HTMLElement | null,
+  options: RevealWordsOnScrollOptions = {},
+) => {
+  const split = prepareWordSplit(element);
+  if (!split?.words?.length) return split;
+
+  const {
+    start = "top 85%",
+    once = true,
+    duration = HERO_REVEAL.duration,
+  } = options;
+
+  gsap.to(split.words, {
+    yPercent: 0,
+    duration,
+    stagger: HERO_REVEAL.stagger,
+    ease: HERO_REVEAL.ease,
+    scrollTrigger: {
+      trigger: element,
+      start,
+      once,
+    },
+  });
+
+  return split;
+};
+
 export const prepareLineSplit = (
   element: HTMLElement | null,
   splitVars: RevealSplitVars = {},

@@ -12,7 +12,7 @@ export function ArchitectureServices({
   }
 
   return (
-    <section className="bg-background py-24 lg:py-32">
+    <section className="section-padding bg-background">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
           <div className="animate-on-scroll lg:col-span-4">

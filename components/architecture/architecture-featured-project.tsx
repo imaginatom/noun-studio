@@ -17,7 +17,7 @@ export function ArchitectureFeaturedProject({
   content?: FeaturedProjectContent;
 }) {
   return (
-    <section data-snap-soft className="bg-muted/40 py-24 lg:py-32">
+    <section data-snap-soft className="section-padding bg-muted/40">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <SoftReveal
           y={48}

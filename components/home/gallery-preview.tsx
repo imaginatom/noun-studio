@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage";
-import { SectionChapterIntro } from "@/components/home/section-transition";
+import { SectionEyebrow } from "@/components/home/section-eyebrow";
 import { ModularGridOverlay } from "@/components/ModularGridBackground";
 
 type GalleryContent = HomePageContent["galleryPreview"];
@@ -66,17 +66,24 @@ function GalleryShowcaseRow({
   const ref = useRef<HTMLLIElement>(null);
   const [motion, setMotion] = useState<RowMotion>(hiddenRowMotion);
   const [loaded, setLoaded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const frame = useRef<number | null>(null);
   const numberLabel = String(index + 1).padStart(2, "0");
   const totalLabel = String(total).padStart(2, "0");
+  const mobileGrayscale = Math.min(1, Math.max(0, 1 - motion.progress * 1.25));
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
+    const mobileMq = window.matchMedia("(max-width: 1023px)");
+    const syncMobile = () => setIsMobile(mobileMq.matches);
+    syncMobile();
+    mobileMq.addEventListener("change", syncMobile);
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setMotion(settledRowMotion);
-      return;
+      return () => mobileMq.removeEventListener("change", syncMobile);
     }
 
     const update = () => {
@@ -96,6 +103,7 @@ function GalleryShowcaseRow({
     window.__lenis?.on("scroll", onScroll);
 
     return () => {
+      mobileMq.removeEventListener("change", syncMobile);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", update);
       window.__lenis?.off("scroll", onScroll);
@@ -118,40 +126,10 @@ function GalleryShowcaseRow({
       <Link
         href={`/realisations/${row.slug}`}
         aria-label={`Voir le projet ${row.alt}`}
-        className="grid grid-cols-12 items-center gap-6 py-10 lg:py-14 xl:py-16"
+        className="flex flex-col gap-6 py-10 lg:gap-8 lg:py-14 xl:py-16"
       >
-        <span
-          className="col-span-2 font-serif text-4xl font-light italic leading-none text-background/55 transition-colors duration-500 group-hover:text-background md:text-5xl lg:col-span-2 lg:text-6xl xl:text-[5rem]"
-          aria-hidden="true"
-        >
-          {numberLabel}
-        </span>
-
-        <div className="col-span-6 flex flex-col gap-3 lg:col-span-6">
-          <span className="text-[10px] font-medium uppercase tracking-[0.36em] text-background/45">
-            {row.label} · {totalLabel}/{totalLabel}
-          </span>
-          <h3
-            className={cn(
-              "font-serif font-light leading-[0.95] text-background transition-transform duration-700",
-              "text-2xl md:text-3xl lg:text-[2.5rem] xl:text-[3rem]",
-              "group-hover:translate-x-2",
-            )}
-            style={{ letterSpacing: "-0.018em" }}
-          >
-            {row.alt}
-          </h3>
-          <span className="mt-3 inline-flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.32em] text-background/60 transition-colors group-hover:text-background">
-            <span
-              className="h-px w-6 bg-current transition-all duration-500 group-hover:w-12"
-              aria-hidden="true"
-            />
-            Voir le projet
-          </span>
-        </div>
-
         <div
-          className="relative col-span-4 aspect-[4/5] overflow-hidden lg:col-span-4 lg:aspect-[3/4]"
+          className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/10] lg:aspect-[3/2]"
           style={{
             transform: `translate3d(0, ${motion.parallaxY}px, 0)`,
             willChange: "transform",
@@ -167,15 +145,19 @@ function GalleryShowcaseRow({
             src={row.src}
             alt={row.alt}
             fill
-            sizes="(max-width: 1024px) 40vw, 28vw"
+            sizes="(max-width: 1024px) 100vw, 55vw"
             onLoad={() => setLoaded(true)}
             className={cn(
-              "object-cover grayscale transition-all ease-out will-change-transform [transition-duration:1200ms]",
+              "object-cover transition-[transform,filter,opacity] ease-out will-change-transform [transition-duration:1200ms]",
               loaded ? "opacity-100" : "opacity-0",
-              "group-hover:scale-[1.04] group-hover:grayscale-0",
+              "group-hover:scale-[1.04]",
+              !isMobile && "grayscale group-hover:grayscale-0",
             )}
             style={{
               transform: `scale(${1 + (1 - motion.progress) * 0.06})`,
+              ...(isMobile
+                ? { filter: `grayscale(${mobileGrayscale})` }
+                : undefined),
             }}
           />
           <div
@@ -189,6 +171,37 @@ function GalleryShowcaseRow({
             <ArrowUpRight className="h-4 w-4" strokeWidth={1.25} />
           </div>
         </div>
+
+        <div className="flex flex-col gap-3">
+          <div className="flex items-baseline gap-4">
+            <span
+              className="font-serif text-3xl font-light italic leading-none text-background/55 transition-colors duration-500 group-hover:text-background md:text-4xl"
+              aria-hidden="true"
+            >
+              {numberLabel}
+            </span>
+            <span className="text-[10px] font-medium uppercase tracking-[0.36em] text-background/45">
+              {row.label} · {numberLabel}/{totalLabel}
+            </span>
+          </div>
+          <h3
+            className={cn(
+              "font-serif font-light leading-[0.95] text-background transition-transform duration-700",
+              "text-2xl md:text-3xl lg:text-[2.5rem] xl:text-[3rem]",
+              "group-hover:translate-y-1",
+            )}
+            style={{ letterSpacing: "-0.018em" }}
+          >
+            {row.alt}
+          </h3>
+          <span className="mt-1 inline-flex items-center gap-3 text-[10px] font-medium uppercase tracking-[0.32em] text-background/60 transition-colors group-hover:text-background">
+            <span
+              className="h-px w-6 bg-current transition-all duration-500 group-hover:w-12"
+              aria-hidden="true"
+            />
+            Voir le projet
+          </span>
+        </div>
       </Link>
     </li>
   );
@@ -198,13 +211,7 @@ function GalleryStickyIntro({ content }: { content: GalleryContent }) {
   return (
     <div className="lg:sticky lg:top-28 lg:flex lg:max-h-[calc(100dvh-7rem)] lg:flex-col lg:justify-center">
       <div className="flex flex-col gap-8">
-        <p className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.32em] text-background/65">
-          <span
-            className="inline-block h-px w-8 bg-background/40"
-            aria-hidden="true"
-          />
-          {content.eyebrow}
-        </p>
+        <SectionEyebrow tone="dark">{content.eyebrow}</SectionEyebrow>
         <h2
           className="font-serif font-light leading-[0.95] text-background text-balance text-[clamp(2.5rem,5.6vw,5.5rem)]"
           style={{ letterSpacing: "-0.025em" }}
@@ -232,15 +239,9 @@ function GalleryStickyIntro({ content }: { content: GalleryContent }) {
 export function GalleryPreview({
   content = homePageDefaults.galleryPreview,
   images = [],
-  chapter,
-  chapterLabel,
-  chapterQuote,
 }: {
   content?: GalleryContent;
   images?: Array<{ src: string; alt: string; label: string; slug: string }>;
-  chapter?: string;
-  chapterLabel?: string;
-  chapterQuote?: string;
 }) {
   if (images.length === 0) {
     return null;
@@ -258,23 +259,7 @@ export function GalleryPreview({
       <ModularGridOverlay logoRatio={0.05} />
 
       <div className="relative z-[1]">
-        {chapter && (
-          <SectionChapterIntro
-            chapter={chapter}
-            label={chapterLabel}
-            quote={chapterQuote}
-            isDark
-            embedded
-            className="relative"
-          />
-        )}
-
-        <div
-          className={cn(
-            "relative mx-auto max-w-7xl px-6 lg:px-10",
-            chapter ? "pt-16 pb-24 lg:pt-20 lg:pb-32" : "py-24 lg:py-32",
-          )}
-        >
+        <div className="section-padding relative mx-auto max-w-7xl px-6 lg:px-10">
           <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-4">
               <GalleryStickyIntro content={content} />
@@ -291,12 +276,6 @@ export function GalleryPreview({
                   />
                 ))}
               </ul>
-
-              <div className="mt-12 flex items-center justify-between border-t border-background/15 pt-8 text-[10px] font-medium uppercase tracking-[0.32em] text-background/55">
-                <span>Index — sélection</span>
-                <span>Oran · Algérie</span>
-                <span>{new Date().getFullYear()}</span>
-              </div>
             </div>
           </div>
         </div>

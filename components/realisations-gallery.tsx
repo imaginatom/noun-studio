@@ -72,12 +72,12 @@ export function RealisationsGallery({ categories, projects }: RealisationsGaller
     <section
       id="realisations-projects"
       aria-label="Réalisations"
-      className="relative isolate overflow-hidden bg-black pb-24 text-background lg:pb-32"
+      className="section-padding relative isolate overflow-hidden bg-black text-background"
     >
       <ModularGridOverlay logoRatio={0.05} />
 
       <div className="relative z-[1]">
-        <div className="mx-auto max-w-7xl px-6 py-10 lg:px-10 lg:py-12">
+        <div className="mx-auto max-w-7xl px-6 py-5 lg:px-10 lg:py-12">
           <div
             className="flex flex-wrap items-center justify-center gap-2"
             role="tablist"
@@ -104,7 +104,7 @@ export function RealisationsGallery({ categories, projects }: RealisationsGaller
           </div>
         </div>
 
-        <div className="mx-auto max-w-7xl px-6 pt-12 lg:px-10 lg:pt-16">
+        <div className="mx-auto max-w-7xl px-6 pt-6 lg:px-10 lg:pt-16">
           <div className="columns-1 gap-4 md:columns-2 lg:columns-3">
             {filtered.map((project, i) => (
               <GalleryImageCard
@@ -116,7 +116,7 @@ export function RealisationsGallery({ categories, projects }: RealisationsGaller
           </div>
 
           {filtered.length === 0 && (
-            <p className="py-20 text-center text-background/60">
+            <p className="py-10 text-center text-background/60 lg:py-20">
               {"Aucune réalisation dans cette catégorie pour le moment."}
             </p>
           )}

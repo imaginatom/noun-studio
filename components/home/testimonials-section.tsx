@@ -3,21 +3,14 @@
 import { useEffect, useState } from "react"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage"
-import { SectionChapterIntro } from "@/components/home/section-transition"
-import { cn } from "@/lib/utils"
+import { SectionEyebrow } from "@/components/home/section-eyebrow"
 
 type TestimonialsContent = HomePageContent["testimonials"]
 
 export function TestimonialsSection({
   content = homePageDefaults.testimonials,
-  chapter,
-  chapterLabel,
-  chapterQuote,
 }: {
   content?: TestimonialsContent
-  chapter?: string
-  chapterLabel?: string
-  chapterQuote?: string
 }) {
   const [current, setCurrent] = useState(0)
   const testimonials = content.items
@@ -38,22 +31,11 @@ export function TestimonialsSection({
 
   return (
     <section id="testimonials-section" data-grid-tier="wide" className="relative bg-background">
-      {chapter && (
-        <SectionChapterIntro
-          chapter={chapter}
-          label={chapterLabel}
-          quote={chapterQuote}
-          embedded
-        />
-      )}
-      <div
-        className={cn(
-          "section-shell",
-          chapter ? "pb-24 pt-24 lg:pb-32 lg:pt-32" : "py-24 lg:py-32",
-        )}
-      >
+      <div className="section-shell section-padding">
         <div className="stagger-children mb-16 flex items-baseline justify-between border-b border-border pb-6">
-          <p className="animate-on-scroll animate-fade-left eyebrow">— {content.eyebrow}</p>
+          <SectionEyebrow className="animate-on-scroll animate-fade-left">
+            {content.eyebrow}
+          </SectionEyebrow>
           <p className="animate-on-scroll animate-fade-right text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
             {String(current + 1).padStart(2, "0")} /{" "}
             {String(testimonials.length).padStart(2, "0")}

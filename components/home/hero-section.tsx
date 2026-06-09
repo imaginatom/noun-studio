@@ -17,7 +17,6 @@ export function HeroSection({
 }) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const badgeRef = useRef<HTMLDivElement | null>(null);
-  const mobileEyebrowRef = useRef<HTMLParagraphElement | null>(null);
   const headlineRef = useRef<HTMLHeadingElement | null>(null);
   const subtitleRef = useRef<HTMLParagraphElement | null>(null);
   const bulletsRef = useRef<HTMLUListElement | null>(null);
@@ -53,15 +52,14 @@ export function HeroSection({
           revealSplit(subtitleRef.current, introTl, ">");
           introTl.addLabel("rest", ">");
 
-          revealSplit(mobileEyebrowRef.current, introTl, "rest");
           revealBlock(badgeRef.current, introTl, "rest");
 
           if (bulletsRef.current) {
-            gsap.utils.toArray<HTMLLIElement>("li", bulletsRef.current).forEach(
-              (bullet) => {
+            gsap.utils
+              .toArray<HTMLLIElement>("li", bulletsRef.current)
+              .forEach((bullet) => {
                 revealSplit(bullet, introTl, "rest");
-              },
-            );
+              });
           }
 
           revealBlock(secondaryCtaRef.current, introTl, "rest");
@@ -126,26 +124,17 @@ export function HeroSection({
         <span className="h-16 w-px bg-background/30" aria-hidden="true" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-40 lg:px-10 lg:pb-28">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
+      <div className="section-padding relative z-10 mx-auto w-full max-w-7xl px-6 lg:px-10">
+        <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-8">
-            <div className="mb-8 overflow-hidden lg:hidden">
-              <p
-                ref={mobileEyebrowRef}
-                className="eyebrow !text-background/70"
-              >
-                {content.badgeText}
-              </p>
-            </div>
-
             <h1
               ref={headlineRef}
-              className="overflow-hidden font-serif text-5xl font-light leading-[1.02] tracking-tight text-balance text-background sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem]"
+              className="overflow-hidden pt-20 font-serif text-5xl font-light leading-[1.02] tracking-tight text-balance text-background sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem]"
             >
               {content.title}
             </h1>
 
-            <div className="mt-10 flex items-start gap-5 lg:max-w-xl">
+            <div className="mt-5 flex items-start gap-5 lg:mt-10 lg:max-w-xl">
               <span
                 className="mt-3 hidden h-px w-12 shrink-0 bg-background/50 sm:block"
                 aria-hidden="true"
@@ -165,7 +154,7 @@ export function HeroSection({
             {content.trustBullets.length > 0 && (
               <ul
                 ref={bulletsRef}
-                className="space-y-3 border-l border-background/20 pl-6"
+                className="hidden space-y-3 border-l border-background/20 pl-6 lg:block"
               >
                 {content.trustBullets.map((bullet) => (
                   <li
@@ -178,7 +167,7 @@ export function HeroSection({
               </ul>
             )}
 
-            <div className="mt-10 flex flex-col gap-2">
+            <div className="mt-5 flex flex-col gap-2 lg:mt-10">
               <div className="overflow-hidden">
                 <div ref={secondaryCtaRef}>
                   <HoverFillLink

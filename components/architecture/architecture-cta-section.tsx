@@ -2,7 +2,6 @@ import { ProjectImage } from "@/components/project-image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Parallax } from "@/components/motion";
 
 type ImageCtaContent = {
   phrase: string;
@@ -56,8 +55,8 @@ export function ArchitectureCtaSection({
   quote = "Chaque projet débute par une conversation. Parlons du vôtre.",
 }: ArchitectureCtaSectionProps) {
   return (
-    <section data-snap-soft className="relative overflow-hidden py-20 lg:py-28">
-      <Parallax y={-0.12} scaleFrom={0.06} className="absolute inset-0">
+    <section data-snap-soft className="section-padding relative overflow-hidden">
+      <div className="absolute inset-0">
         <ProjectImage
           src={content.backgroundImage.src}
           alt={content.backgroundImage.alt}
@@ -66,7 +65,7 @@ export function ArchitectureCtaSection({
           sizes="100vw"
           priority={false}
         />
-      </Parallax>
+      </div>
       <div className="absolute inset-0 bg-foreground/35" aria-hidden="true" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-10">

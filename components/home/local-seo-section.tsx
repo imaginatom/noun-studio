@@ -1,6 +1,5 @@
 import { homePageDefaults, type HomePageContent } from "@/lib/content/homepage";
-import { SectionChapterIntro } from "@/components/home/section-transition";
-import { cn } from "@/lib/utils";
+import { SectionEyebrow } from "@/components/home/section-eyebrow";
 
 type LocalSeoContent = HomePageContent["localSeo"];
 
@@ -9,19 +8,11 @@ const ANCRAGE_LOCAL_BG = "/ancrage-local-bg.png";
 
 export function LocalSeoSection({
   content = homePageDefaults.localSeo,
-  chapter,
-  chapterLabel,
 }: {
   content?: LocalSeoContent;
-  chapter?: string;
-  chapterLabel?: string;
 }) {
   return (
     <section data-grid-tier="wide" className="bg-background">
-      {chapter && (
-        <SectionChapterIntro chapter={chapter} label={chapterLabel} embedded />
-      )}
-
       <div className="relative overflow-hidden">
         <div
           aria-hidden="true"
@@ -33,17 +24,12 @@ export function LocalSeoSection({
           className="pointer-events-none absolute inset-0 bg-background/72"
         />
 
-        <div
-          className={cn(
-            "section-shell relative z-[1]",
-            chapter ? "pt-24 pb-24 lg:pt-32 lg:pb-32" : "py-24 lg:py-32",
-          )}
-        >
+        <div className="section-shell section-padding relative z-[1]">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="stagger-children lg:col-span-5">
-              <p className="animate-on-scroll animate-fade eyebrow !text-xs md:!text-[13px]">
-                — {content.eyebrow}
-              </p>
+              <SectionEyebrow className="animate-on-scroll animate-fade !text-xs md:!text-[13px]">
+                {content.eyebrow}
+              </SectionEyebrow>
               <h2 className="animate-on-scroll animate-reveal-text mt-6 font-serif text-[2.75rem] font-light leading-[1.05] text-foreground md:text-6xl">
                 {content.title}
               </h2>

@@ -8,7 +8,7 @@ export function ArchitecturePhilosophy({
   content?: PhilosophyContent
 }) {
   return (
-    <section className="bg-background py-24 lg:py-32">
+    <section className="section-padding bg-background">
       <div className="mx-auto max-w-7xl px-6 lg:px-10">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
           <div className="animate-on-scroll animate-fade-left lg:col-span-5">

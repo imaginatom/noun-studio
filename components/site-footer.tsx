@@ -9,17 +9,11 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ]
 
-const team = [
-  { name: "SAHNOUNE Mohammed", role: "Architecte · Directeur Créatif" },
-  { name: "Adda Echikh", role: "Designer Graphique · Direction Artistique" },
-  { name: "Sid Ahmed Lakber", role: "Développement Web · Digital" },
-]
-
 export function SiteFooter() {
   return (
     <footer role="contentinfo" className="border-t border-border bg-background text-foreground">
       
-      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-24">
+      <div className="section-padding mx-auto max-w-7xl px-6 lg:px-10">
         <div className="grid gap-14 md:grid-cols-12">
           <div className="md:col-span-5">
             <SiteLogo size="lg" />
@@ -77,20 +71,6 @@ export function SiteFooter() {
                 <Linkedin className="h-4 w-4" strokeWidth={1.5} />
               </a>
             </div>
-          </div>
-
-          <div className="md:col-span-3">
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
-              L&apos;équipe
-            </p>
-            <ul className="mt-6 flex flex-col gap-5">
-              {team.map((member) => (
-                <li key={member.name}>
-                  <p className="text-sm text-foreground">{member.name}</p>
-                  <p className="mt-1 text-xs font-light text-muted-foreground">{member.role}</p>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </div>

@@ -1,64 +1,64 @@
-import type { CSSProperties } from "react"
-import { cn } from "@/lib/utils"
-import { ExpertiseVideo } from "@/components/home/expertise-video"
+import type { CSSProperties } from "react";
+import { cn } from "@/lib/utils";
+import { ExpertiseVideo } from "@/components/home/expertise-video";
 
 /** Background of the content section that follows this transition */
-export type SectionTransitionBg = "background" | "muted" | "whyUs" | "dark"
+export type SectionTransitionBg = "background" | "muted" | "whyUs" | "dark";
 
 export type SectionChapterIntroProps = {
-  chapter: string
-  label?: string
-  quote?: string
-  videoSrc?: string
-  isDark?: boolean
-  align?: "center" | "left"
+  chapter?: string;
+  label?: string;
+  quote?: string;
+  videoSrc?: string;
+  isDark?: boolean;
+  align?: "center" | "left";
   /** Adds spacing before the section body when nested inside a parent section */
-  embedded?: boolean
+  embedded?: boolean;
   /** Show chapter content immediately (no scroll reveal) — use for bottom-of-page embedded intros */
-  revealOnMount?: boolean
-  className?: string
-}
+  revealOnMount?: boolean;
+  className?: string;
+};
 
 type SectionTransitionProps = {
-  chapter: string
-  label?: string
-  quote?: string
-  videoSrc?: string
+  chapter?: string;
+  label?: string;
+  quote?: string;
+  videoSrc?: string;
   /** @deprecated Use sectionBg instead */
-  tone?: "light" | "dark"
-  sectionBg?: SectionTransitionBg
-  isDark?: boolean
-  align?: "center" | "left"
-  className?: string
-}
+  tone?: "light" | "dark";
+  sectionBg?: SectionTransitionBg;
+  isDark?: boolean;
+  align?: "center" | "left";
+  className?: string;
+};
 
 function sectionSurfaceClasses(sectionBg: SectionTransitionBg): {
-  className: string
-  style?: CSSProperties
-  isDark: boolean
+  className: string;
+  style?: CSSProperties;
+  isDark: boolean;
 } {
   switch (sectionBg) {
     case "muted":
       return {
         className: "bg-muted/40 text-foreground",
         isDark: false,
-      }
+      };
     case "whyUs":
       return {
         className: "bg-transparent text-foreground",
         isDark: false,
-      }
+      };
     case "dark":
       return {
         className: "bg-black text-background",
         isDark: true,
-      }
+      };
     case "background":
     default:
       return {
         className: "bg-background text-foreground",
         isDark: false,
-      }
+      };
   }
 }
 
@@ -68,12 +68,15 @@ function ChapterHeader({
   isDark,
   align = "center",
 }: {
-  chapter: string
-  label?: string
-  isDark: boolean
-  align?: "center" | "left"
+  chapter?: string;
+  label?: string;
+  isDark: boolean;
+  align?: "center" | "left";
 }) {
-  const centered = align === "center"
+  if (!chapter && !label) {
+    return null;
+  }
+  const centered = align === "center";
 
   return (
     <>
@@ -117,7 +120,7 @@ function ChapterHeader({
         </span>
       )}
     </>
-  )
+  );
 }
 
 export function SectionChapterIntro({
@@ -131,17 +134,12 @@ export function SectionChapterIntro({
   revealOnMount = false,
   className,
 }: SectionChapterIntroProps) {
-  const hasSplitMedia = Boolean(videoSrc && quote)
-  const resolvedAlign = align ?? (hasSplitMedia ? "left" : "center")
+  const hasSplitMedia = Boolean(videoSrc && quote);
+  const resolvedAlign = align ?? (hasSplitMedia ? "left" : "center");
 
   return (
     <div
-      className={cn(
-        "relative w-full overflow-hidden",
-        isDark ? "pt-32 lg:pt-40" : "pt-20 lg:pt-28",
-        embedded && (hasSplitMedia ? "pb-16 lg:pb-20" : "pb-12 lg:pb-16"),
-        className,
-      )}
+      className={cn("section-padding relative w-full overflow-hidden", className)}
     >
       {isDark && !embedded && (
         <div
@@ -152,53 +150,39 @@ export function SectionChapterIntro({
 
       {hasSplitMedia ? (
         <div className="section-shell relative">
-          <div className="grid items-center gap-10 lg:grid-cols-[2fr_3fr] lg:gap-14 xl:gap-20">
-            <div
-              className={cn(
-                "animate-on-scroll animate-fade-left flex flex-col text-left",
-                revealOnMount && "is-visible",
-              )}
-            >
-              <ChapterHeader
-                chapter={chapter}
-                label={label}
-                isDark={isDark}
-                align="left"
-              />
-              <p
-                className={cn(
-                  "mt-8 font-serif text-xl font-light italic leading-relaxed md:text-2xl lg:text-[1.65rem] lg:leading-relaxed",
-                  isDark ? "text-background/85" : "text-foreground/85",
-                )}
-              >
-                {quote}
-              </p>
-            </div>
-
-            <div
-              className={cn(
-                "animate-on-scroll animate-fade-right w-full",
-                revealOnMount && "is-visible",
-              )}
-            >
-              <ExpertiseVideo src={videoSrc!} />
-            </div>
-          </div>
+          <ExpertiseVideo
+            src={videoSrc!}
+            eyebrow={label ?? "Intro"}
+            intro={quote}
+            isDark={isDark}
+            introClassName={cn(
+              "animate-on-scroll animate-fade-left",
+              revealOnMount && "is-visible",
+            )}
+            videoClassName={cn(
+              "animate-on-scroll animate-fade-right",
+              revealOnMount && "is-visible",
+            )}
+          />
         </div>
       ) : (
         <div
           className={cn(
             "section-shell animate-on-scroll animate-fade relative flex flex-col",
             revealOnMount && "is-visible",
-            resolvedAlign === "center" ? "items-center text-center" : "items-start text-left",
+            resolvedAlign === "center"
+              ? "items-center text-center"
+              : "items-start text-left",
           )}
         >
-          <ChapterHeader
-            chapter={chapter}
-            label={label}
-            isDark={isDark}
-            align={resolvedAlign}
-          />
+          {(chapter || label) && (
+            <ChapterHeader
+              chapter={chapter}
+              label={label}
+              isDark={isDark}
+              align={resolvedAlign}
+            />
+          )}
 
           {quote && (
             <p
@@ -213,7 +197,7 @@ export function SectionChapterIntro({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export function SectionTransition({
@@ -228,14 +212,18 @@ export function SectionTransition({
   align,
 }: SectionTransitionProps) {
   const resolvedBg: SectionTransitionBg =
-    sectionBg ?? (tone === "dark" ? "dark" : "background")
-  const surface = sectionSurfaceClasses(resolvedBg)
-  const isDark = isDarkProp ?? surface.isDark
+    sectionBg ?? (tone === "dark" ? "dark" : "background");
+  const surface = sectionSurfaceClasses(resolvedBg);
+  const isDark = isDarkProp ?? surface.isDark;
 
   return (
     <section
       data-grid-tier="wide"
-      className={cn("relative w-full overflow-hidden", surface.className, className)}
+      className={cn(
+        "relative w-full overflow-hidden",
+        surface.className,
+        className,
+      )}
       style={surface.style}
     >
       <SectionChapterIntro
@@ -247,5 +235,5 @@ export function SectionTransition({
         align={align}
       />
     </section>
-  )
+  );
 }
