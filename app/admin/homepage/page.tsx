@@ -1257,6 +1257,41 @@ export default function AdminHomepageEditor() {
                   />
                 </div>
               </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <ImageUpload
+                  label="Background image"
+                  value={{
+                    src: content.contactCta.backgroundImage.src,
+                    path: content.contactCta.backgroundImage.path ?? null,
+                  }}
+                  onChange={(nextValue) =>
+                    updateSection("contactCta", (prev) => ({
+                      ...prev,
+                      backgroundImage: {
+                        ...prev.backgroundImage,
+                        src: nextValue.src,
+                        path: nextValue.path ?? null,
+                      },
+                    }))
+                  }
+                />
+                <div className="space-y-2">
+                  <Label htmlFor="contact-bg-alt">Background alt text</Label>
+                  <Input
+                    id="contact-bg-alt"
+                    value={content.contactCta.backgroundImage.alt}
+                    onChange={(event) =>
+                      updateSection("contactCta", (prev) => ({
+                        ...prev,
+                        backgroundImage: {
+                          ...prev.backgroundImage,
+                          alt: event.target.value,
+                        },
+                      }))
+                    }
+                  />
+                </div>
+              </div>
             </CardContent>
             <CardFooter className="flex flex-wrap items-center justify-between gap-3">
               <Button

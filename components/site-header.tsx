@@ -14,24 +14,17 @@ import { cn } from "@/lib/utils"
 import { HoverFillLink } from "@/components/hover-fill-link"
 import { SiteLogo } from "@/components/site-logo"
 
-const leftNavLinks = [
+const navLinks = [
   { href: "/architecture", label: "Services" },
   { href: "/realisations", label: "Portfolio" },
-] as const
-
-const rightNavLinks = [
-  { href: "/#approche", label: "À propos" },
   { href: "/contact", label: "Contact" },
 ] as const
 
-const mobileNavLinks = [...leftNavLinks, ...rightNavLinks]
+const mobileNavLinks = navLinks
 
 const SCROLL_DELTA = 8
 
 function isNavActive(pathname: string, href: string) {
-  if (href === "/#approche") {
-    return pathname === "/"
-  }
   return pathname === href
 }
 
@@ -115,15 +108,8 @@ export function SiteHeader() {
       )}
     >
       <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
-        <div className="relative flex h-10 items-center lg:grid lg:h-auto lg:grid-cols-[1fr_auto_1fr] lg:items-center">
-          <nav
-            aria-label="Navigation principale — gauche"
-            className="hidden items-center gap-10 lg:flex"
-          >
-            {leftNavLinks.map(renderNavLink)}
-          </nav>
-
-          <div className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 lg:justify-self-center">
+        <div className="flex h-10 items-center justify-between lg:h-auto">
+          <div>
             <SiteLogo
               variant={isTransparent ? "light" : "default"}
               size="sm"
@@ -136,12 +122,12 @@ export function SiteHeader() {
             />
           </div>
 
-          <div className="ml-auto flex items-center gap-6 lg:ml-0 lg:justify-self-end">
+          <div className="flex items-center gap-6">
             <nav
-              aria-label="Navigation principale — droite"
+              aria-label="Navigation principale"
               className="hidden items-center gap-10 lg:flex"
             >
-              {rightNavLinks.map(renderNavLink)}
+              {navLinks.map(renderNavLink)}
             </nav>
 
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>

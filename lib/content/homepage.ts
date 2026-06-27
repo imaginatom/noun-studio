@@ -76,6 +76,11 @@ export type HomePageContent = {
     subtitle: string
     emailLabel: string
     emailAddress: string
+    backgroundImage: {
+      src: string
+      alt: string
+      path?: string | null
+    }
   }
 }
 
@@ -240,6 +245,10 @@ export const homePageDefaults: HomePageContent = {
     subtitle: 'Consultation gratuite — réponse garantie sous 48h',
     emailLabel: 'Email',
     emailAddress: 'contact@nounstudio.dz',
+    backgroundImage: {
+      src: '/images/contact-bg.jpg',
+      alt: 'Projet architectural par Noun Studio',
+    },
   },
 }
 
@@ -366,6 +375,12 @@ export const mergeHomePageContent = (
         isRecord(localSeoOverride) ? localSeoOverride.highlights : undefined,
       ),
     },
-    contactCta: mergeObject(homePageDefaults.contactCta, contactCtaOverride),
+    contactCta: {
+      ...mergeObject(homePageDefaults.contactCta, contactCtaOverride),
+      backgroundImage: mergeObject(
+        homePageDefaults.contactCta.backgroundImage,
+        isRecord(contactCtaOverride) ? contactCtaOverride.backgroundImage : undefined,
+      ),
+    },
   }
 }
