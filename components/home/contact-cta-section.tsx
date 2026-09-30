@@ -13,7 +13,7 @@ export function ContactCtaSection({
   return (
     <section
       id="contact"
-      data-grid-tier="bleed"
+      data-grid-tier="wide"
       className="relative isolate overflow-hidden bg-foreground text-background"
     >
       {content.backgroundImage?.src && (
